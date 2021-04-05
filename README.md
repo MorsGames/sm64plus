@@ -24,7 +24,7 @@ A: Yes.
 
 This repo does **not** include all the assets necessary for compiling the game. A prior copy of the game is required to extract the assets. Binaries of the game will **not** be distributed for this very reason.
 
-That being said, there is an official launcher that will help you build the game and configure its settings easily. You can download it from [MFGG]([once it's out](https://www.mfgg.net/?act=resdb&param=02&c=2&id=38190)). It is for 64-bit Windows systems only.
+That being said, there is an official launcher that will help you build the game and configure its settings easily. You can download it from [MFGG](https://www.mfgg.net/?act=resdb&param=02&c=2&id=38190). It is for 64-bit Windows systems only.
 
 You can also build the game manually if you prefer to do so, or if you're not on a Windows platform. To do that, follow the following instructions.
 
