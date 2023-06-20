@@ -601,6 +601,10 @@ s32 act_freefall(struct MarioState *m) {
     if (m->input & INPUT_B_PRESSED) {
         return set_mario_action(m, ACT_DIVE, 0);
     }
+    
+    if ((m->input & INPUT_A_PRESSED)&& (m->coyoteframes <= 5)){
+        return set_mario_action(m, ACT_JUMP, 0);
+    }
 
     if (m->input & INPUT_Z_PRESSED) {
         return set_mario_action(m, ACT_GROUND_POUND, 0);
