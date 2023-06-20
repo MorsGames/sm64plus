@@ -659,7 +659,11 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     if (configCoyoteFrames) {
         m->coyoteframes += 1;
         }
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> c5a1449ee01bd3ed4dfa4a6b28c88dcf3b696e0c
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->vel[0] / 4.0f;
         intendedPos[1] = m->pos[1] + m->vel[1] / 4.0f;
