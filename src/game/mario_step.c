@@ -654,7 +654,10 @@ s32 perform_air_step(struct MarioState *m, u32 stepArg) {
     s32 stepResult = AIR_STEP_NONE;
 
     m->wall = NULL;
-    m->coyoteframes += 1;
+    if (configCoyoteFrames) {
+        m->coyoteframes += 1;
+        }
+        
     for (i = 0; i < 4; i++) {
         intendedPos[0] = m->pos[0] + m->vel[0] / 4.0f;
         intendedPos[1] = m->pos[1] + m->vel[1] / 4.0f;

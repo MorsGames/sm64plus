@@ -197,6 +197,7 @@ s8 configDisableFallDamage = 0;
 s8 configLeaveAnyTime = 0;
 s8 configVisibleSecrets = 0;
 s8 configFixExploits = 0;
+u8 configCoyoteFrames = 0;//dunno if this should go into gameplay or controls
 
 s8 configBowsersSub = 1;
 unsigned int configStayInCourse = 0;
