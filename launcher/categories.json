@@ -242,6 +242,14 @@
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Full Air Control"
+    }, {
+        "internal_name": "coyote_frames",
+        "description": "Allows mario to jump for a configurable amount of frames after running off of a ledge.",
+        "os": OS_ANY,
+        "type": TYPE_UINT,
+        "enabled_by": -1,
+        "disabled_by": 0,
+        "name": "Coyote Frames"
     }],
     "hidden": false,
     "reload_with_preset": true,

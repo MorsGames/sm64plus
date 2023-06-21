@@ -46,7 +46,6 @@ extern s8 configDisableFallDamage;
 extern s8 configLeaveAnyTime;
 extern s8 configVisibleSecrets;
 extern s8 configFixExploits;
-extern u8 configCoyoteFrames;
 
 extern s8 configBowsersSub;
 extern unsigned int configStayInCourse;
@@ -89,6 +88,7 @@ extern s8 gSunshineDive;
 extern s8 gOdysseyDive;
 extern s8 configRolling;
 extern s8 gFlashbackPound;
+extern u8 configCoyoteFrames;
 
 extern s8 configUnusedPyramidCutscene;
 extern s8 configRestoreUnusedSounds;
