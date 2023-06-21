@@ -66,6 +66,7 @@ static const struct ConfigOption options[] = {
     { .name = "enemy_bouncing", .type = CONFIG_TYPE_BOOL, .boolValue = &configEnemyBouncing },
     { .name = "dpad_controls", .type = CONFIG_TYPE_BOOL, .boolValue = &configDpadControls },
     { .name = "full_air_control", .type = CONFIG_TYPE_BOOL, .boolValue = &configFullAirControl },
+    { .name = "coyote_frames", .type = CONFIG_TYPE_UINT, .uintValue = &configCoyoteFrames },
 
     { .name = "GAMEPLAY", .type = CONFIG_TYPE_SECTION },
     { .name = "apply_bug_fixes", .type = CONFIG_TYPE_UINT, .uintValue = &configApplyBugFixes },
@@ -81,7 +82,6 @@ static const struct ConfigOption options[] = {
     { .name = "allow_leaving_the_course_at_any_time", .type = CONFIG_TYPE_BOOL, .boolValue = &configLeaveAnyTime },
     { .name = "make_secrets_visible", .type = CONFIG_TYPE_BOOL, .boolValue = &configVisibleSecrets },
     { .name = "fix_exploits", .type = CONFIG_TYPE_BOOL, .boolValue = &configFixExploits },
-    { .name = "coyote_frames", .type = CONFIG_TYPE_UINT, .uintValue = &configCoyoteFrames }, //dunno if this should go into gameplay or controls
 
     { .name = "PROGRESSION", .type = CONFIG_TYPE_SECTION },
     { .name = "tie_bowsers_sub_to_missions", .type = CONFIG_TYPE_BOOL, .boolValue = &configBowsersSub },
