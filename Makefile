@@ -379,7 +379,7 @@ endif
 
 AS        := $(CROSS)as
 ifeq ($(COMPILER),gcc)
-  CC      := $(CROSS)gcc
+  CC      := $(CROSS)gcc -fdiagnostics-color -w
 else
   ifeq ($(USE_QEMU_IRIX),1)
     IRIX_ROOT := $(TOOLS_DIR)/ido5.3_compiler
@@ -452,24 +452,24 @@ ifeq ($(TARGET_MACOS),1)
 endif
 
 # Platform-specific compiler and linker flags, including SDL stuff
-SDLCONFIG_CFLAGS := $(shell sdl2-config --cflags)
+SDLCONFIG_CFLAGS := $(shell sdl2-config --prefix=/mingw64 --cflags)
 
 # Static linking is broken on Windows for some reason so we will roll like this for now
 ifeq ($(TARGET_WINDOWS),1)
   ifeq ($(TARGET_32BIT),0)
     PLATFORM_LDFLAGS := -o sm64plus icon.res
   endif
-  SDLCONFIG_LDFLAGS := -Wl,-Bdynamic $(shell sdl2-config --libs) -Wl,-Bstatic -Llib
+  SDLCONFIG_LDFLAGS := -Wl,-Bdynamic $(shell sdl2-config --prefix=/mingw64 --libs) -Wl,-Bstatic -Llib
   PLATFORM_CFLAGS  := $(SDLCONFIG_CFLAGS) -DTARGET_WINDOWS
   PLATFORM_LDFLAGS := $(SDLCONFIG_LDFLAGS) -static -lm -no-pie -mwindows -w
 endif
 ifeq ($(TARGET_LINUX),1)
-  SDLCONFIG_LDFLAGS := $(shell sdl2-config --libs)
+  SDLCONFIG_LDFLAGS := $(shell sdl2-config --prefix=/mingw64 --libs)
   PLATFORM_CFLAGS  := $(SDLCONFIG_CFLAGS) -DTARGET_LINUX `pkg-config --cflags libusb-1.0`
   PLATFORM_LDFLAGS := $(SDLCONFIG_LDFLAGS) -lm -lpthread `pkg-config --libs libusb-1.0` -no-pie
 endif
 ifeq ($(TARGET_MACOS),1)
-  SDLCONFIG_LDFLAGS := $(shell sdl2-config --libs)
+  SDLCONFIG_LDFLAGS := $(shell sdl2-config --prefix=/mingw64 --libs)
   PLATFORM_CFLAGS  := $(SDLCONFIG_CFLAGS) -DTARGET_MACOS -DTIMER_ABSTIME=1 `pkg-config --cflags libusb-1.0`
   PLATFORM_LDFLAGS := $(SDLCONFIG_LDFLAGS) -lm -lpthread `pkg-config --libs libusb-1.0` -no-pie
 endif
@@ -848,16 +848,16 @@ $(GLOBAL_ASM_DEP).$(NON_MATCHING):
 # Compile C/C++ code
 $(BUILD_DIR)/%.o: %.cpp
 	$(call print,Compiling:,$<,$@)
-	@$(CXX) -fsyntax-only $(CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
-	$(V)$(CXX) -c $(CFLAGS) -o $@ $<
+	@$(CXX) -fsyntax-only $(CFLAGS) -fdiagnostics-color -w -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
+	$(V)$(CXX) -c $(CFLAGS) -fdiagnostics-color -w -o $@ $<
 $(BUILD_DIR)/%.o: %.c
 	$(call print,Compiling:,$<,$@)
-	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
-	$(V)$(CC) -c $(CFLAGS) -o $@ $<
+	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -fdiagnostics-color -w -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
+	$(V)$(CC) -c $(CFLAGS) -fdiagnostics-color -w -o $@ $<
 $(BUILD_DIR)/%.o: $(BUILD_DIR)/%.c
 	$(call print,Compiling:,$<,$@)
-	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
-	$(V)$(CC) -c $(CFLAGS) -o $@ $<
+	@$(CC_CHECK) $(CC_CHECK_CFLAGS) -fdiagnostics-color -w -MMD -MP -MT $@ -MF $(BUILD_DIR)/$*.d $<
+	$(V)$(CC) -c $(CFLAGS) -fdiagnostics-color -w -o $@ $<
 
 # Alternate compiler flags needed for matching
 ifeq ($(COMPILER),ido)
