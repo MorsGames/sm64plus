@@ -63,7 +63,7 @@ float sStarGetSpeed = 0.0f;
 
 // Custom left and right snapping functions
 s32 get_left(s32 value) {
-    if (config4by3Hud || configForce4by3) {
+    if (config4by3Hud || configAspectRatio == 1) {
         return value;
     }
     else {
@@ -71,7 +71,7 @@ s32 get_left(s32 value) {
     }
 }
 s32 get_right(s32 value) {
-    if (config4by3Hud || configForce4by3) {
+    if (config4by3Hud || configAspectRatio == 1) {
         return SCREEN_WIDTH-value;
     }
     else {
@@ -81,20 +81,12 @@ s32 get_right(s32 value) {
 
 f32 get_power_meter_x() {
     if (configHudLayout == 2) {
-        if (get_mirror()) {
-            return SCREEN_WIDTH - get_right(46);
-        } else {
-            return get_right(46);
-        }
+        return get_right(46);
     }
     else if (configHudLayout == 1) {
         return SCREEN_WIDTH/2;
     } else {
-        if (get_mirror()) {
-            return SCREEN_WIDTH - (f32) sPowerMeterHUD.x;
-        } else {
-            return sPowerMeterHUD.x;
-        }
+        return sPowerMeterHUD.x;
     }
 }
 

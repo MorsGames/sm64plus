@@ -2,9 +2,9 @@
 
 Implementation of a Fast3D renderer for games built originally for the Nintendo 64 platform.
 
-For rendering OpenGL, Direct3D 11 and Direct3D 12 are supported.
+For rendering, OpenGL is supported.
 
-Supported windowing systems are GLX (used on Linux), DXGI (used on Windows) and SDL (generic).
+For windowing, SDL (generic) is supported.
 
 # Usage
 

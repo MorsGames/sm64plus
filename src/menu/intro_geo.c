@@ -195,7 +195,7 @@ static Gfx *intro_backdrop_one_image(s32 index, s8 *backgroundTable) {
     const u8 *const *vIntroBgTable;
     s32 i;
 
-    if (configForce4by3) {
+    if (configAspectRatio == 1) {
         vIntroBgTable = segmented_to_virtual(textureTables[backgroundTable[index]]);
         guTranslate(mtx, xCoords[index], yCoords[index], 0.0f);
     }
@@ -243,7 +243,7 @@ Gfx *geo_intro_regular_backdrop(s32 state, struct GraphNode *node, UNUSED void *
 
     if (state == 1) {  // draw
 
-        if (configForce4by3) {
+        if (configAspectRatio == 1) {
             dl = alloc_display_list(16 * sizeof(*dl));
             size = 12;
         }
@@ -294,7 +294,7 @@ Gfx *geo_intro_gameover_backdrop(s32 state, struct GraphNode *node, UNUSED void 
     } else {  // draw
         dl = alloc_display_list(16 * sizeof(*dl));
 
-        if (configForce4by3) {
+        if (configAspectRatio == 1) {
             dl = alloc_display_list(16 * sizeof(*dl));
             size = ARRAY_COUNT(gameOverBackgroundTable);
         }

@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #ifdef __linux__
@@ -20,9 +21,6 @@
 
 #include "gfx/gfx_pc.h"
 #include "gfx/gfx_opengl.h"
-#include "gfx/gfx_direct3d11.h"
-#include "gfx/gfx_direct3d12.h"
-#include "gfx/gfx_dxgi.h"
 #include "gfx/gfx_sdl.h"
 #include "gfx/gfx_dummy.h"
 
@@ -246,29 +244,13 @@ void main_func(const char* gfx_dir) {
 
     switch (configGraphicsBackend)
     {
-#if defined(__linux__) || defined(__BSD__) || defined(TARGET_MACOS)
-    case 0:
-        rendering_api = &gfx_opengl_api;
-        wm_api = &gfx_sdl;
-        break;
-
-#elif defined(_WIN32) || defined(_WIN64)
-    case 0:
-        rendering_api = &gfx_direct3d11_api;
-        wm_api = &gfx_dxgi_api;
-        break;
-    case 1:
-        rendering_api = &gfx_direct3d12_api;
-        wm_api = &gfx_dxgi_api;
-        break;
-    case 2:
-        rendering_api = &gfx_opengl_api;
-        wm_api = &gfx_sdl;
-        break;
-#endif
-    default:
+    case -1:
         rendering_api = &gfx_dummy_renderer_api;
         wm_api = &gfx_dummy_wm_api;
+        break;
+    default:
+        rendering_api = &gfx_opengl_api;
+        wm_api = &gfx_sdl;
         break;
     }
     gfx_init(wm_api, rendering_api, gTitleString, configFullscreen);
@@ -301,8 +283,17 @@ void main_func(const char* gfx_dir) {
 }
 
 #if defined(_WIN32) || defined(_WIN64)
+#include <stdbool.h>
 int WINAPI WinMain(UNUSED HINSTANCE hInstance, UNUSED HINSTANCE hPrevInstance, UNUSED LPSTR pCmdLine, UNUSED int nCmdShow) {
+    AttachConsole(ATTACH_PARENT_PROCESS);
+
+    FILE *fp;
+    freopen_s(&fp, "CONOUT$", "w", stdout);
+    freopen_s(&fp, "CONOUT$", "w", stderr);
+    freopen_s(&fp, "CONIN$", "r", stdin);
+
     main_func(NULL);
+    
     return 0;
 }
 #else

@@ -6,17 +6,30 @@
 #define FOR_WINDOWS 0
 #endif
 
+#include <stdint.h>
+#include <stdio.h>
+#include <unistd.h>
+
+#ifdef VERSION_EU
+# define FRAME_RATE 50
+#else
+# define FRAME_RATE 60
+#endif
+
 #if FOR_WINDOWS
 #include <GL/glew.h>
 #include "SDL.h"
+#include "SDL_syswm.h"
 #define GL_GLEXT_PROTOTYPES 1
 #include "SDL_opengl.h"
 #else
 #ifndef TARGET_MACOS
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_syswm.h>
 #else
 #include <SDL_opengl.h>
 #include <SDL.h>
+#include <SDL_syswm.h>
 #include <stdio.h>
 #endif
 #define GL_GLEXT_PROTOTYPES 1
@@ -30,11 +43,15 @@
 
 #include "game/settings.h"
 
+#if defined(_WIN32) || defined(_WIN64)
+#include "../../include/resource.h"
+#endif
+
 #define GFX_API_NAME "OpenGL"
 
 static SDL_Window *wnd;
 static int inverted_scancode_table[512];
-static int vsync_enabled = 0;
+
 static unsigned int window_width;
 static unsigned int window_height;
 static bool fullscreen_state;
@@ -45,7 +62,17 @@ static void (*on_all_keys_up_callback)(void);
 static void (*on_mouse_move_callback)(long x, long y);
 static void (*on_mouse_press_callback)(s8 left, s8 right, s8 middle, s8 wheel);
 
-static Uint32 last_time;
+static bool relative_mouse_mode_on = false;
+
+static Uint64 min_ticks_per_frame = 0;
+static Uint64 next_frame_ticks = 0;
+static Uint64 perf_freq = 0;
+
+static int8_t clamp_s8(long val) {
+    if (val < -128) return -128;
+    if (val > 127) return 127;
+    return val;
+}
 
 const SDL_Scancode windows_scancode_table[] =
 { 
@@ -136,75 +163,38 @@ static void set_fullscreen(bool on, bool call_callback) {
     }
 }
 
-int test_vsync(void) {
-    // Even if SDL_GL_SetSwapInterval succeeds, it doesn't mean that VSync actually works.
-    // A 60 Hz monitor should have a swap interval of 16.67 milliseconds.
-    // Try to detect the length of a vsync by swapping buffers some times.
-    // Since the graphics card may enqueue a fixed number of frames,
-    // first send in four dummy frames to hopefully fill the queue.
-    // This method will fail if the refresh rate is changed, which, in
-    // combination with that we can't control the queue size (i.e. lag)
-    // is a reason this generic SDL2 backend should only be used as last resort.
-    Uint32 start;
-    Uint32 end;
-
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    start = SDL_GetTicks();
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    SDL_GL_SwapWindow(wnd);
-    end = SDL_GetTicks();
-
-    float average = 4.0 * 1000.0 / (end - start);
-
-    vsync_enabled = 1;
-    /*if (average > 27 && average < 33) {
-        SDL_GL_SetSwapInterval(1);
-    } else if (average > 57 && average < 63) {
-        SDL_GL_SetSwapInterval(2);
-    } else if (average > 86 && average < 94) {
-        SDL_GL_SetSwapInterval(3);
-    } else if (average > 115 && average < 125) {
-        SDL_GL_SetSwapInterval(4);
-    } else {
-        vsync_enabled = 0;
-    }*/
-    if (average > 57 && average < 63) {
-        SDL_GL_SetSwapInterval(1);
-    } else if (average > 115 && average < 125) {
-        SDL_GL_SetSwapInterval(2);
-    } else {
-        vsync_enabled = 0;
-    }
-}
-
 static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
     window_width = DESIRED_SCREEN_WIDTH;
     window_height = DESIRED_SCREEN_HEIGHT;
+
+    SDL_SetHint(SDL_HINT_TIMER_RESOLUTION, "1");
 
     SDL_Init(SDL_INIT_VIDEO);
 
     SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
-    //SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
-
-    char title[512];
-    sprintf(title, "%s (%s)", game_name, GFX_API_NAME);
-
-    wnd = SDL_CreateWindow(title,
+    wnd = SDL_CreateWindow(game_name,
             SDL_WINDOWPOS_UNDEFINED_DISPLAY(configDefaultMonitor-1),
             SDL_WINDOWPOS_UNDEFINED_DISPLAY(configDefaultMonitor-1),
-            window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
+            window_width, window_height, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_ALLOW_HIGHDPI);
+
+#if defined(_WIN32) || defined(_WIN64)
+    // Set window icon from embedded resources
+    HINSTANCE hInstance = GetModuleHandle(NULL);
+    HICON hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(STAR_ICON));
+    if (hIcon) {
+        // Get the window handle from SDL
+        SDL_SysWMinfo wmInfo;
+        SDL_VERSION(&wmInfo.version);
+        if (SDL_GetWindowWMInfo(wnd, &wmInfo)) {
+            HWND hwnd = wmInfo.info.win.window;
+            // Set both the large and small icons
+            SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+            SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        }
+    }
+#endif
 
     if (start_in_fullscreen) {
         set_fullscreen(true, false);
@@ -212,15 +202,19 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
 
     if (configMouseCam) {
         SDL_SetRelativeMouseMode(true);
+        relative_mouse_mode_on = true;
     }
 
     SDL_GL_CreateContext(wnd);
 
-    SDL_GL_SetSwapInterval(1);
-    test_vsync();
-    if (!vsync_enabled)
-        puts("Warning: VSync is not enabled or not working. Falling back to timer for synchronization");
+    SDL_GL_SetSwapInterval(configVSync ? 1 : 0);
 
+    SDL_DisableScreenSaver();
+    
+    perf_freq = SDL_GetPerformanceFrequency();
+    min_ticks_per_frame = perf_freq / FRAME_RATE;
+    next_frame_ticks = SDL_GetPerformanceCounter() + min_ticks_per_frame;
+    
     for (size_t i = 0; i < sizeof(windows_scancode_table) / sizeof(SDL_Scancode); i++) {
         inverted_scancode_table[windows_scancode_table[i]] = i;
     }
@@ -230,8 +224,8 @@ static void gfx_sdl_init(const char *game_name, bool start_in_fullscreen) {
     }
 
     for (size_t i = 0; i < sizeof(scancode_rmapping_nonextended) / sizeof(scancode_rmapping_nonextended[0]); i++) {
-        inverted_scancode_table[scancode_rmapping_extended[i][0]] = inverted_scancode_table[scancode_rmapping_extended[i][1]];
-        inverted_scancode_table[scancode_rmapping_extended[i][1]] += 0x100;
+        inverted_scancode_table[scancode_rmapping_nonextended[i][0]] = inverted_scancode_table[scancode_rmapping_nonextended[i][1]];
+        inverted_scancode_table[scancode_rmapping_nonextended[i][1]] += 0x100;
     }
 }
 
@@ -255,7 +249,14 @@ static void gfx_sdl_main_loop(void (*run_one_game_iter)(void)) {
     while (1) {
         run_one_game_iter();
         if (configMouseCam) {
-            SDL_SetRelativeMouseMode((SDL_GetWindowFlags(wnd) & SDL_WINDOW_INPUT_FOCUS) == SDL_WINDOW_INPUT_FOCUS);
+            bool want = (SDL_GetWindowFlags(wnd) & SDL_WINDOW_INPUT_FOCUS) == SDL_WINDOW_INPUT_FOCUS;
+            if (want != relative_mouse_mode_on) {
+                SDL_SetRelativeMouseMode(want);
+                relative_mouse_mode_on = want;
+            }
+        } else if (relative_mouse_mode_on) {
+            SDL_SetRelativeMouseMode(false);
+            relative_mouse_mode_on = false;
         }
     }
 }
@@ -353,35 +354,49 @@ static void gfx_sdl_handle_events(void) {
                 break;
 
             case SDL_MOUSEWHEEL:
-                on_mouse_press_callback(0, 0, 0, event.wheel.y);
+                on_mouse_press_callback(0, 0, 0, clamp_s8(event.wheel.y));
                 break;
         }
     }
 }
 
 static bool gfx_sdl_start_frame(void) {
-    last_time = SDL_GetTicks();
     return true;
 }
 
-static void sync_framerate_with_timer(void) {
-    // Number of milliseconds a frame should take (60 fps)
-    const Uint32 FRAME_TIME = 1000 / 60;
-    Uint32 elapsed = SDL_GetTicks() - last_time;
-
-    if (elapsed < FRAME_TIME)
-        SDL_Delay(FRAME_TIME - elapsed);
-}
-
 static void gfx_sdl_swap_buffers_begin(void) {
-    if (!vsync_enabled) {
-        sync_framerate_with_timer();
-    }
-
     SDL_GL_SwapWindow(wnd);
 }
 
 static void gfx_sdl_swap_buffers_end(void) {
+    // Get the current time in ticks
+    Uint64 now_ticks = SDL_GetPerformanceCounter();
+
+    // If we're ahead of schedule, wait until it's time for the next frame
+    if (now_ticks < next_frame_ticks) {
+        const Uint64 ticks_remaining = next_frame_ticks - now_ticks;
+        const Uint64 ms_remaining = (ticks_remaining * 1000) / perf_freq;
+
+        // Sleep for most of the remaining time
+        if (ms_remaining >= 2) {
+            Uint32 coarse_ms = (Uint32)(ms_remaining - 1);
+            SDL_Delay(coarse_ms);
+        }
+
+        // Busy-wait for the rest
+        while (true) {
+            now_ticks = SDL_GetPerformanceCounter();
+            if (now_ticks >= next_frame_ticks)
+                 break;
+            SDL_Delay(0);
+        }
+    }
+
+    // If we're running behind, then FUCK!!!
+    now_ticks = SDL_GetPerformanceCounter();
+    if (now_ticks >= next_frame_ticks) {
+        next_frame_ticks = now_ticks + min_ticks_per_frame;
+    }
 }
 
 static double gfx_sdl_get_time(void) {

@@ -29,14 +29,39 @@ static bool haptics_enabled;
 static SDL_Haptic *sdl_haptic;
 
 static void controller_sdl_init(void) {
+#if defined(_WIN32) || defined(_WIN64)
+    if (configBlockNonXinputControllers) {
+        // Prioritize XInput by disabling other joystick backends.
+        SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT, "0");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+    }
+#endif
     
-    SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
         return;
     }
 
+    int added = -1;
+    char *basePath = SDL_GetBasePath();
+    if (basePath != NULL) {
+        char dbPath[4096];
+        snprintf(dbPath, sizeof(dbPath), "%sgamecontrollerdb.txt", basePath);
+        added = SDL_GameControllerAddMappingsFromFile(dbPath);
+        SDL_free(basePath);
+    }
+    
+    // Also try the current working directory just in case
+    if (added < 0) {
+        if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") < 0) {
+            printf("Failed to load gamecontrollerdb.txt: %s\n", SDL_GetError());
+        }
+    }
+
     haptics_enabled = (SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
+    if (!haptics_enabled) {
+        printf("Haptic init failed (ignoring): %s\n", SDL_GetError());
+    }
 
     init_ok = true;
 }

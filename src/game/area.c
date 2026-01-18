@@ -124,7 +124,7 @@ void print_intro_text(s8 in_game) {
 #ifdef VERSION_EU
                 print_text(20, 20, "START");
 #else
-            s32 left = (config4by3Hud || configForce4by3) ? 60 : GFX_DIMENSIONS_FROM_LEFT_EDGE(60);
+            s32 left = (config4by3Hud || configAspectRatio == 1) ? 60 : GFX_DIMENSIONS_FROM_LEFT_EDGE(60);
 
             print_text_centered(left, 38, "PRESS");
             print_text_centered(left, 20, "START");
@@ -436,12 +436,6 @@ void render_game(void) {
         } else {
             clear_frame_buffer(gWarpTransFBSetColor);
         }
-    }
-
-    if (configForce4by3) {
-        gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(0, 0, 0, 1));
-        gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0, 0, SCREEN_HEIGHT);
-        gDPFillRectangle(gDisplayListHead++, SCREEN_WIDTH, 0, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT);
     }
 
     D_8032CE74 = NULL;

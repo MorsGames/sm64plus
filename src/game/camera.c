@@ -1105,6 +1105,21 @@ void radial_camera_move(struct Camera *c) {
             s2ndRotateFlags &= ~CAM_MOVE_ROTATE_LEFT;
         }
 
+        if (configImprovedCButtonCamera)
+        {
+            if (gPlayer1Controller->buttonPressed & L_CBUTTONS || gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+                play_sound_cbutton_side();
+            }
+            if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
+                sModeOffsetYaw -= ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+                gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+            }
+            if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
+                sModeOffsetYaw += ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+                gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+            }
+        }
+
         // Analog camera code
         if (gPlayer1Controller->stick2X != 0 &&
             gCurrDemoInput == NULL)
@@ -1257,13 +1272,28 @@ void mode_8_directions_camera(struct Camera *c) {
 
     radial_camera_input(c, 0.f);
 
-    if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
-        s8DirModeYawOffset += DEGREES(45);
-        play_sound_cbutton_side();
+    if (configImprovedCButtonCamera)
+    {
+        if (gPlayer1Controller->buttonPressed & L_CBUTTONS || gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            play_sound_cbutton_side();
+        }
+        if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
+            s8DirModeYawOffset += ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+        }
+        if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
+            s8DirModeYawOffset -= ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+        }
     }
-    if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
-        s8DirModeYawOffset -= DEGREES(45);
-        play_sound_cbutton_side();
+    else
+    {
+        if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            s8DirModeYawOffset += DEGREES(45);
+            play_sound_cbutton_side();
+        }
+        if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+            s8DirModeYawOffset -= DEGREES(45);
+            play_sound_cbutton_side();
+        }
     }
 
     // Analog camera code
@@ -1302,13 +1332,28 @@ void mode_custom_camera(struct Camera *c, f32 yOff, f32 additionalDistance, s8 l
 
     radial_camera_input(c, 0.f);
 
-    if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
-        sModeOffsetYaw += DEGREES(22.5);
-        play_sound_cbutton_side();
+    if (configImprovedCButtonCamera)
+    {
+        if (gPlayer1Controller->buttonPressed & L_CBUTTONS || gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            play_sound_cbutton_side();
+        }
+        if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
+            sModeOffsetYaw -= ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+        }
+        if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
+            sModeOffsetYaw += ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+        }
     }
-    if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
-        sModeOffsetYaw -= DEGREES(22.5);
-        play_sound_cbutton_side();
+    else
+    {
+        if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+            sModeOffsetYaw += DEGREES(22.5);
+            play_sound_cbutton_side();
+        }
+        if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+            sModeOffsetYaw -= DEGREES(22.5);
+            play_sound_cbutton_side();
+        }
     }
 
     // Analog camera code
@@ -5139,63 +5184,66 @@ s32 radial_camera_input(struct Camera *c, UNUSED f32 unused) {
         }
 
         // Rotate Right and left
-        if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
-            if (sModeOffsetYaw > -0x800) {
-                // The camera is now rotating right
-                if (!(gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)) {
-                    gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
-                }
-
-                if (c->mode == CAMERA_MODE_RADIAL) {
-                    // if > ~48 degrees, we're rotating for the second time.
-                    if (sModeOffsetYaw > 0x22AA) {
-                        s2ndRotateFlags |= CAM_MOVE_ROTATE_RIGHT;
+        if (!configImprovedCButtonCamera)
+        {
+            if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+                if (sModeOffsetYaw > -0x800) {
+                    // The camera is now rotating right
+                    if (!(gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT)) {
+                        gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
                     }
 
-                    if (sModeOffsetYaw == DEGREES(105)) {
-                        play_sound_button_change_blocked();
+                    if (c->mode == CAMERA_MODE_RADIAL) {
+                        // if > ~48 degrees, we're rotating for the second time.
+                        if (sModeOffsetYaw > 0x22AA) {
+                            s2ndRotateFlags |= CAM_MOVE_ROTATE_RIGHT;
+                        }
+
+                        if (sModeOffsetYaw == DEGREES(105)) {
+                            play_sound_button_change_blocked();
+                        } else {
+                            play_sound_cbutton_side();
+                        }
                     } else {
-                        play_sound_cbutton_side();
+                        if (sModeOffsetYaw == DEGREES(60)) {
+                            play_sound_button_change_blocked();
+                        } else {
+                            play_sound_cbutton_side();
+                        }
                     }
                 } else {
-                    if (sModeOffsetYaw == DEGREES(60)) {
-                        play_sound_button_change_blocked();
-                    } else {
-                        play_sound_cbutton_side();
-                    }
+                    gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE;
+                    play_sound_cbutton_up();
                 }
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE;
-                play_sound_cbutton_up();
             }
-        }
-        if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
-            if (sModeOffsetYaw < 0x800) {
-                if (!(gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)) {
-                    gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
-                }
-
-                if (c->mode == CAMERA_MODE_RADIAL) {
-                    // if < ~48 degrees, we're rotating for the second time.
-                    if (sModeOffsetYaw < -0x22AA) {
-                        s2ndRotateFlags |= CAM_MOVE_ROTATE_LEFT;
+            if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+                if (sModeOffsetYaw < 0x800) {
+                    if (!(gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT)) {
+                        gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
                     }
 
-                    if (sModeOffsetYaw == DEGREES(-105)) {
-                        play_sound_button_change_blocked();
+                    if (c->mode == CAMERA_MODE_RADIAL) {
+                        // if < ~48 degrees, we're rotating for the second time.
+                        if (sModeOffsetYaw < -0x22AA) {
+                            s2ndRotateFlags |= CAM_MOVE_ROTATE_LEFT;
+                        }
+
+                        if (sModeOffsetYaw == DEGREES(-105)) {
+                            play_sound_button_change_blocked();
+                        } else {
+                            play_sound_cbutton_side();
+                        }
                     } else {
-                        play_sound_cbutton_side();
+                        if (sModeOffsetYaw == DEGREES(-60)) {
+                            play_sound_button_change_blocked();
+                        } else {
+                            play_sound_cbutton_side();
+                        }
                     }
                 } else {
-                    if (sModeOffsetYaw == DEGREES(-60)) {
-                        play_sound_button_change_blocked();
-                    } else {
-                        play_sound_cbutton_side();
-                    }
+                    gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE;
+                    play_sound_cbutton_up();
                 }
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_RETURN_TO_MIDDLE;
-                play_sound_cbutton_up();
             }
         }
     }
@@ -5279,27 +5327,44 @@ void handle_c_button_movement(struct Camera *c) {
         }
 
         // Rotate left or right
-        cSideYaw = 0x1000;
-        if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
-            if (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
-                gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
-                if (sCSideButtonYaw == 0) {
-                    play_sound_cbutton_side();
-                }
-                sCSideButtonYaw = -cSideYaw;
+        if (configImprovedCButtonCamera)
+        {
+            if (gPlayer1Controller->buttonPressed & L_CBUTTONS || gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+                play_sound_cbutton_side();
+            }
+            if (gPlayer1Controller->buttonDown & L_CBUTTONS) {
+                sCSideButtonYaw = ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+                gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_RIGHT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
+            }
+            if (gPlayer1Controller->buttonDown & R_CBUTTONS) {
+                sCSideButtonYaw = -ANALOG_AMOUNT * configCameraSpeed * 2.0f;
+                gCameraMovementFlags &= ~(CAM_MOVE_ROTATE_LEFT | CAM_MOVE_ENTERED_ROTATE_SURFACE);
             }
         }
-        if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
-            if (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
-                gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT;
-            } else {
-                gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
-                if (sCSideButtonYaw == 0) {
-                    play_sound_cbutton_side();
+        else
+        {
+            cSideYaw = 0x1000;
+            if (gPlayer1Controller->buttonPressed & R_CBUTTONS) {
+                if (gCameraMovementFlags & CAM_MOVE_ROTATE_LEFT) {
+                    gCameraMovementFlags &= ~CAM_MOVE_ROTATE_LEFT;
+                } else {
+                    gCameraMovementFlags |= CAM_MOVE_ROTATE_RIGHT;
+                    if (sCSideButtonYaw == 0) {
+                        play_sound_cbutton_side();
+                    }
+                    sCSideButtonYaw = -cSideYaw;
                 }
-                sCSideButtonYaw = cSideYaw;
+            }
+            if (gPlayer1Controller->buttonPressed & L_CBUTTONS) {
+                if (gCameraMovementFlags & CAM_MOVE_ROTATE_RIGHT) {
+                    gCameraMovementFlags &= ~CAM_MOVE_ROTATE_RIGHT;
+                } else {
+                    gCameraMovementFlags |= CAM_MOVE_ROTATE_LEFT;
+                    if (sCSideButtonYaw == 0) {
+                        play_sound_cbutton_side();
+                    }
+                    sCSideButtonYaw = cSideYaw;
+                }
             }
         }
 

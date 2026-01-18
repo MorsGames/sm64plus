@@ -1937,7 +1937,7 @@ s32 act_long_jump_land(struct MarioState *m) {
 #endif
 
     // Sorry daddy...
-    if (configFixExploits && m->forwardVel < 0.0f) {
+    if (configApplyBugFixes > 2 && m->forwardVel < 0.0f) {
         m->forwardVel = 0.0f;
     }
 

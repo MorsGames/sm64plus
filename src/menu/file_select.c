@@ -248,8 +248,10 @@ static unsigned char textCopyCompleted[][18] = {{ TEXT_COPYING_COMPLETED }, { TE
 
 #ifndef VERSION_EU
 static unsigned char textSavedDataExists[] = { TEXT_SAVED_DATA_EXISTS };
+static unsigned char textSavedDataExistsFixed[] = { 0x1C,0x0A,0x1F,0x0E,0x0D,0x9E,0x0D,0x0A,0x1D,0x0A,0x9E,0x0E,0x21,0x12,0x1C,0x1D,0x1C,0xFF };
 #else
 static unsigned char textSavedDataExists[][20] = {{ TEXT_SAVED_DATA_EXISTS }, { TEXT_SAVED_DATA_EXISTS_FR }, { TEXT_SAVED_DATA_EXISTS_DE }};
+static unsigned char textSavedDataExistsFixed[][20] = {{ 0x1C,0x0A,0x1F,0x0E,0x0D,0x9E,0x0D,0x0A,0x1D,0x0A,0x9E,0x0E,0x21,0x12,0x1C,0x1D,0x1C,0xFF }, { TEXT_SAVED_DATA_EXISTS_FR }, { TEXT_SAVED_DATA_EXISTS_DE }};
 #endif
 
 #ifndef VERSION_EU
@@ -1687,7 +1689,7 @@ void handle_controller_cursor_input(void) {
     sCursorPos[1] += (rawStickY - (configMouseCam ? gPlayer1Controller->rawStick2Y : 0)) / 8;
 
     // Stop cursor from going offscreen
-    if (config4by3Hud || configForce4by3) {
+    if (config4by3Hud || configAspectRatio == 1) {
         if (sCursorPos[0] > 132.0f) {
             sCursorPos[0] = 132.0f;
         }
@@ -2160,7 +2162,7 @@ void copy_menu_display_message(s8 messageID) {
 #ifdef VERSION_EU
             centeredX = get_str_x_pos_from_center(160, textSavedDataExists[sLanguageMode], 10.0f);
 #endif
-            print_generic_string_fade(SAVE_EXISTS_X1, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(SAVE_EXISTS_X1, 190, configFixTextTypos ? LANGUAGE_ARRAY(textSavedDataExistsFixed) : LANGUAGE_ARRAY(textSavedDataExists));
             break;
     }
 }
@@ -2440,7 +2442,7 @@ void erase_menu_display_message(s8 messageID) {
 #ifdef VERSION_EU
             centeredX = get_str_x_pos_from_center(160, textSavedDataExists[sLanguageMode], 10.0f);
 #endif
-            print_generic_string_fade(SAVE_EXISTS_X2, 190, LANGUAGE_ARRAY(textSavedDataExists));
+            print_generic_string_fade(SAVE_EXISTS_X2, 190, configFixTextTypos ? LANGUAGE_ARRAY(textSavedDataExistsFixed) : LANGUAGE_ARRAY(textSavedDataExists));
             break;
     }
 }
@@ -2927,6 +2929,11 @@ static void print_file_select_strings(void) {
  */
 Gfx *geo_file_select_strings_and_menu_cursor(s32 callContext, UNUSED struct GraphNode *node, UNUSED Mat4 mtx) {
     if (callContext == GEO_CONTEXT_RENDER) {
+
+        gDPSetFillColor(gDisplayListHead++, GPACK_RGBA5551(0, 0, 0, 1));
+        gDPFillRectangle(gDisplayListHead++, GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(0), 0, 0, SCREEN_HEIGHT);
+        gDPFillRectangle(gDisplayListHead++, SCREEN_WIDTH, 0, GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(0), SCREEN_HEIGHT);
+        
         print_file_select_strings();
         print_menu_cursor();
     }

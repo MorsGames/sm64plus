@@ -2538,7 +2538,7 @@ void parse_p1_controller(void) {
         gdctrl->csrY -= gdctrl->stickY * 0.1; //? 0.1f
     }
     // Clamp cursor position within screen view bounds
-    if (config4by3Hud || configForce4by3) {
+    if (config4by3Hud || configAspectRatio == 1) {
 
         if (gdctrl->csrX < sScreenView->parent->upperLeft.x + 16.0f) {
             gdctrl->csrX = sScreenView->parent->upperLeft.x + 16.0f;

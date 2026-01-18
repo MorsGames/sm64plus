@@ -9,6 +9,7 @@
 #include "save_file.h"
 #include "segment2.h"
 #include "sm64.h"
+#include "game_init.h"
 
 #ifndef TARGET_N64
 #define BETTER_SKYBOX_POSITION_PRECISION
@@ -280,7 +281,7 @@ void *create_skybox_ortho_matrix(s8 player) {
     Mtx *mtx = alloc_display_list(sizeof(*mtx));
 
 #ifdef WIDESCREEN
-    if (!configForce4by3) {
+    if (configAspectRatio != 1) {
         f32 half_width = (4.0f / 3.0f) / GFX_DIMENSIONS_ASPECT_RATIO * SCREEN_WIDTH / 2;
         f32 center = (sSkyBoxInfo[player].scaledX + SCREEN_WIDTH / 2);
         if (half_width < SCREEN_WIDTH / 2) {
@@ -350,6 +351,9 @@ Gfx *create_skybox_facing_camera(s8 player, s8 background, f32 fov,
     //! the first frame, which causes a floating point divide by 0
     fov = 90.0f;
     sSkyBoxInfo[player].yaw = atan2s(cameraFaceZ, cameraFaceX);
+    if (get_mirror()) {
+        sSkyBoxInfo[player].yaw = -sSkyBoxInfo[player].yaw;
+    }
     sSkyBoxInfo[player].pitch = atan2s(sqrtf(cameraFaceX * cameraFaceX + cameraFaceZ * cameraFaceZ), cameraFaceY);
     sSkyBoxInfo[player].scaledX = calculate_skybox_scaled_x(player, fov);
     sSkyBoxInfo[player].scaledY = calculate_skybox_scaled_y(player, fov);

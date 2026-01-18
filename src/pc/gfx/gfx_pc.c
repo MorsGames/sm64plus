@@ -115,6 +115,7 @@ static struct RSP {
     Light_t current_lights[MAX_LIGHTS + 1];
     float current_lights_coeffs[MAX_LIGHTS][3];
     float current_lookat_coeffs[2][3]; // lookat_x, lookat_y
+    Light_t lookat[2];
     uint8_t current_num_lights; // includes ambient light
     bool lights_changed;
     
@@ -952,9 +953,6 @@ static void gfx_sp_matrix(uint8_t parameters, const int32_t *addr) {
     
     if (parameters & G_MTX_PROJECTION) {
         if (parameters & G_MTX_LOAD) {
-            if(get_mirror()) {
-				matrix[0][0] *= -1;
-			}
             memcpy(rsp.P_matrix, matrix, sizeof(matrix));
         } else {
             gfx_matrix_mul(rsp.P_matrix, matrix, rsp.P_matrix);
@@ -1002,6 +1000,10 @@ static void gfx_sp_vertex(size_t n_vertices, size_t dest_index, const Vtx *verti
         
         x = gfx_adjust_x_for_aspect_ratio(x);
         
+        if (get_mirror() && (rsp.geometry_mode & G_ZBUFFER)) {
+            x = -x;
+        }
+        
         short U = v->tc[0] * rsp.texture_scaling_factor.s >> 16;
         short V = v->tc[1] * rsp.texture_scaling_factor.t >> 16;
 
@@ -1015,10 +1017,8 @@ static void gfx_sp_vertex(size_t n_vertices, size_t dest_index, const Vtx *verti
                 for (int i = 0; i < rsp.current_num_lights - 1; i++) {
                     calculate_normal_dir(&rsp.current_lights[i], rsp.current_lights_coeffs[i]);
                 }
-                static const Light_t lookat_x = {{0, 0, 0}, 0, {0, 0, 0}, 0, {0, 127, 0}, 0};
-                static const Light_t lookat_y = {{0, 0, 0}, 0, {0, 0, 0}, 0, {127, 0, 0}, 0};
-                calculate_normal_dir(&lookat_x, rsp.current_lookat_coeffs[0]);
-                calculate_normal_dir(&lookat_y, rsp.current_lookat_coeffs[1]);
+                calculate_normal_dir(&rsp.lookat[0], rsp.current_lookat_coeffs[0]);
+                calculate_normal_dir(&rsp.lookat[1], rsp.current_lookat_coeffs[1]);
                 rsp.lights_changed = false;
             }
             
@@ -1228,7 +1228,7 @@ static void gfx_sp_tri1(uint8_t vtx1_idx, uint8_t vtx2_idx, uint8_t vtx3_idx) {
         
         switch (rsp.geometry_mode & G_CULL_BOTH) {
             case G_CULL_FRONT:
-                if (get_mirror()) {
+                if (get_mirror() && (rsp.geometry_mode & G_ZBUFFER)) {
                     if (cross >= 0) return;
                 }
                 else {
@@ -1236,7 +1236,7 @@ static void gfx_sp_tri1(uint8_t vtx1_idx, uint8_t vtx2_idx, uint8_t vtx3_idx) {
                 }
                 break;
             case G_CULL_BACK:
-                if (get_mirror()) {
+                if (get_mirror() && (rsp.geometry_mode & G_ZBUFFER)) {
                     if (cross <= 0) return;
                 }
                 else {
@@ -1468,10 +1468,10 @@ static void gfx_sp_movemem(uint8_t index, uint8_t offset, const void* data) {
         case G_MV_VIEWPORT:
             gfx_calc_and_set_viewport((const Vp_t *) data);
             break;
-#if 0
+#ifndef F3DEX_GBI_2
         case G_MV_LOOKATY:
         case G_MV_LOOKATX:
-            memcpy(rsp.current_lookat + (index - G_MV_LOOKATY) / 2, data, sizeof(Light_t));
+            memcpy(&rsp.lookat[(index - G_MV_LOOKATY) / 2], data, sizeof(Light_t));
             //rsp.lights_changed = 1;
             break;
 #endif
@@ -1481,6 +1481,16 @@ static void gfx_sp_movemem(uint8_t index, uint8_t offset, const void* data) {
             if (lightidx >= 0 && lightidx <= MAX_LIGHTS) { // skip lookat
                 // NOTE: reads out of bounds if it is an ambient light
                 memcpy(rsp.current_lights + lightidx, data, sizeof(Light_t));
+            }
+            else if (lightidx < 0) {
+                int lookat_idx = offset / 24;
+                if (lookat_idx == 0) {
+                    memcpy(&rsp.lookat[0], data, sizeof(Light_t));
+                }
+                else if (lookat_idx == 1) {
+                    memcpy(&rsp.lookat[1], data, sizeof(Light_t));
+                }
+                rsp.lights_changed = 1;
             }
             break;
         }
@@ -2126,6 +2136,15 @@ static void gfx_sp_reset() {
     rsp.modelview_matrix_stack_size = 1;
     rsp.current_num_lights = 2;
     rsp.lights_changed = true;
+    memset(rsp.lookat, 0, sizeof(rsp.lookat));
+    rsp.lookat[0].dir[0] = 0;
+    rsp.lookat[0].dir[1] = 127;
+    rsp.lookat[0].dir[2] = 0;
+    rsp.lookat[1].dir[0] = 127;
+    rsp.lookat[1].dir[1] = 0;
+    rsp.lookat[1].dir[2] = 0;
+    calculate_normal_dir(&rsp.lookat[0], rsp.current_lookat_coeffs[0]);
+    calculate_normal_dir(&rsp.lookat[1], rsp.current_lookat_coeffs[1]);
 }
 
 void gfx_get_dimensions(uint32_t *width, uint32_t *height) {
@@ -2178,11 +2197,64 @@ struct GfxRenderingAPI *gfx_get_current_rendering_api(void) {
 
 void gfx_start_frame(void) {
     gfx_wapi->handle_events();
-    gfx_wapi->get_dimensions(&gfx_current_dimensions.width, &gfx_current_dimensions.height);
+
+    uint32_t window_width, window_height;
+    gfx_wapi->get_dimensions(&window_width, &window_height);
+
+    if (window_height == 0) {
+        // Avoid division by zero
+        window_height = 1;
+    }
+
+    if (configInternalResolution > 0.0f) {
+
+        float aspect_ratio = (float)window_width / (float)window_height;
+
+        if (configAspectRatio == 1) {
+            aspect_ratio = 4.0f / 3.0f;
+        }
+        else if (configAspectRatio == 2) {
+            aspect_ratio = 16.0f / 9.0f;
+        }
+        
+        gfx_current_dimensions.height = (uint32_t)(240.0f * configInternalResolution);
+        gfx_current_dimensions.width = (uint32_t)((float)gfx_current_dimensions.height * aspect_ratio);
+    }
+    else {
+        if (configAspectRatio == 1 || configAspectRatio == 2) {
+
+            float target_aspect = (configAspectRatio == 1) ? (4.0f / 3.0f) : (16.0f / 9.0f);
+            float window_aspect = (float)window_width / (float)window_height;
+
+            if (window_aspect > target_aspect) {
+                gfx_current_dimensions.height = window_height;
+                gfx_current_dimensions.width = (uint32_t)((float)window_height * target_aspect);
+            }
+            else if (window_aspect < target_aspect) {
+                gfx_current_dimensions.width = window_width;
+                gfx_current_dimensions.height = (uint32_t)((float)window_width / target_aspect);
+            }
+            else {
+                gfx_current_dimensions.width = window_width;
+                gfx_current_dimensions.height = window_height;
+            }
+        }
+        else {
+
+            gfx_current_dimensions.width = window_width;
+            gfx_current_dimensions.height = window_height;
+        }
+    }
+
     if (gfx_current_dimensions.height == 0) {
         // Avoid division by zero
         gfx_current_dimensions.height = 1;
     }
+    if (gfx_current_dimensions.width == 0) {
+        // Avoid division by zero
+        gfx_current_dimensions.width = 1;
+    }
+
     gfx_current_dimensions.aspect_ratio = (float)gfx_current_dimensions.width / (float)gfx_current_dimensions.height;
 }
 
