@@ -41,37 +41,13 @@
         "disabled_by": -1,
         "name": "Default Window Height"
     }, {
-        "internal_name": "custom_fullscreen_resolution",
-        "description": "Allows you to set a custom screen resolution for the fullscreen mode.",
+        "internal_name": "fullscreen_display_mode",
+        "description": "Sets the display mode for the fullscreen mode.",
         "os": OS_ANY,
-        "type": TYPE_BOOL,
+        "type": TYPE_DISPLAY_MODE,
         "enabled_by": -1,
         "disabled_by": -1,
-        "name": "Custom Fullscreen Resolution"
-    }, {
-        "internal_name": "fullscreen_width",
-        "description": "Sets the width of the custom fullscreen resolution in pixels.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": 5,
-        "disabled_by": -1,
-        "name": "Fullscreen Resolution Width"
-    }, {
-        "internal_name": "fullscreen_height",
-        "description": "Sets the height of the custom fullscreen resolution in pixels.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": 5,
-        "disabled_by": -1,
-        "name": "Fullscreen Resolution Height"
-    }, {
-        "internal_name": "fullscreen_refresh_rate",
-        "description": "The refresh rate that will be used for when \"Custom Fullscreen Resolution\" is enabled. 60 is recommended.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": 5,
-        "disabled_by": -1,
-        "name": "Fullscreen Refresh Rate"
+        "name": "Fullscreen Display Mode"
     }],
     "hidden": false,
     "os": OS_ANY
@@ -116,7 +92,7 @@
     "title": "GRAPHICS",
     "items": [{
         "internal_name": "internal_resolution",
-        "description": "Sets the multiplier for the internal resolution. 1x is 240p, 2x is 480p, and so on. Set it to \"Display Resolution\" to use the same resolution as your display (or game window).",
+        "description": "Sets the multiplier for the internal resolution. 1x is 240p, 2x is 480p, and so on. Set it to \"Display Resolution\" to use the same resolution as your display.",
         "os": OS_WINDOWS,
         "type": TYPE_INTERNAL_RESOLUTION,
         "enabled_by": -1,
@@ -124,7 +100,7 @@
         "name": "Internal Resolution"
     }, {
         "internal_name": "aspect_ratio",
-        "description": "Sets the game's aspect ratio. \"Auto\" uses the aspect ratio of your display (or game window).",
+        "description": "Sets the game's aspect ratio. Set it to \"Auto\" to use the aspect ratio of your display.",
         "os": OS_ANY,
         "type": TYPE_ASPECT_RATIO,
         "enabled_by": -1,
@@ -156,7 +132,7 @@
         "name": "Draw Distance"
     }, {
         "internal_name": "level_of_detail",
-        "description": "Sets the level of detail for certain in-game models. \"High\" is recommended.",
+        "description": "Sets the level of detail for certain in-game models.",
         "os": OS_ANY,
         "type": TYPE_LOD,
         "enabled_by": -1,
@@ -172,7 +148,7 @@
         "name": "Texture Filtering"
     }, {
         "internal_name": "anisotropic_filtering",
-        "description": "Enables anisotropic filtering to improve texture quality at oblique angles. Higher values provide better quality. Only works with \"Bilinear\" texture filtering.",
+        "description": "Enables anisotropic filtering to improve texture quality at oblique angles.",
         "os": OS_ANY,
         "type": TYPE_ANISOTROPIC,
         "enabled_by": 6,

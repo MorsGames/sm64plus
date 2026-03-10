@@ -15,25 +15,6 @@
 
 #define ARRAY_LEN(arr) (sizeof(arr) / sizeof(arr[0]))
 
-enum ConfigOptionType {
-    CONFIG_TYPE_BOOL,
-    CONFIG_TYPE_UINT,
-    CONFIG_TYPE_SINT,
-    CONFIG_TYPE_FLOAT,
-    CONFIG_TYPE_SECTION
-};
-
-struct ConfigOption {
-    const char *name;
-    enum ConfigOptionType type;
-    union {
-        bool *boolValue;
-        unsigned int *uintValue;
-        int *sintValue;
-        float *floatValue;
-    };
-};
-
 static const struct ConfigOption options[] = {
     // DISPLAY
     { .name = "DISPLAY", .type = CONFIG_TYPE_SECTION },
@@ -42,10 +23,7 @@ static const struct ConfigOption options[] = {
     { .name = "vsync", .type = CONFIG_TYPE_BOOL, .boolValue = (bool*)&configVSync },
     { .name = "window_width", .type = CONFIG_TYPE_UINT, .uintValue = &configWindowWidth },
     { .name = "window_height", .type = CONFIG_TYPE_UINT, .uintValue = &configWindowHeight },
-    { .name = "custom_fullscreen_resolution", .type = CONFIG_TYPE_BOOL, .boolValue = (bool*)&configCustomFullscreenResolution },
-    { .name = "fullscreen_width", .type = CONFIG_TYPE_UINT, .uintValue = &configFullscreenWidth },
-    { .name = "fullscreen_height", .type = CONFIG_TYPE_UINT, .uintValue = &configFullscreenHeight },
-    { .name = "fullscreen_refresh_rate", .type = CONFIG_TYPE_UINT, .uintValue = &configFullscreenRefreshRate },
+    { .name = "fullscreen_display_mode", .type = CONFIG_TYPE_UINT, .uintValue = &configFullscreenDisplayMode },
     { .name = "graphics_backend", .type = CONFIG_TYPE_UINT, .uintValue = &configGraphicsBackend },
 
     // AUDIO

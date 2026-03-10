@@ -2195,6 +2195,31 @@ struct GfxRenderingAPI *gfx_get_current_rendering_api(void) {
     return gfx_rapi;
 }
 
+bool gfx_begin_frame_render(void) {
+    gfx_sp_reset();
+
+    if (!gfx_wapi->start_frame()) {
+        dropped_frame = true;
+        return false;
+    }
+
+    dropped_frame = false;
+    gfx_rapi->start_frame();
+    return true;
+}
+
+void gfx_end_frame_render(void) {
+    if (!dropped_frame) {
+        gfx_rapi->end_frame();
+    }
+}
+
+void gfx_swap_buffers_begin(void) {
+    if (!dropped_frame) {
+        gfx_wapi->swap_buffers_begin();
+    }
+}
+
 void gfx_start_frame(void) {
     gfx_wapi->handle_events();
 
@@ -2259,21 +2284,14 @@ void gfx_start_frame(void) {
 }
 
 void gfx_run(Gfx *commands) {
-    gfx_sp_reset();
-    
-    //puts("New frame");
-    
-    if (!gfx_wapi->start_frame()) {
-        dropped_frame = true;
+    if (!gfx_begin_frame_render()) {
         return;
     }
-    dropped_frame = false;
-    
-    gfx_rapi->start_frame();
+
     gfx_run_dl(commands);
     gfx_flush();
-    gfx_rapi->end_frame();
-    gfx_wapi->swap_buffers_begin();
+    gfx_end_frame_render();
+    gfx_swap_buffers_begin();
 }
 
 void gfx_end_frame(void) {

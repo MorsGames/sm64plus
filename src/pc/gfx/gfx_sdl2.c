@@ -68,6 +68,25 @@ static Uint64 min_ticks_per_frame = 0;
 static Uint64 next_frame_ticks = 0;
 static Uint64 perf_freq = 0;
 
+static int get_display_index(void) {
+    int display_index = (int) configDefaultMonitor - 1;
+    int num_displays = SDL_GetNumVideoDisplays();
+
+    if (display_index < 0 || display_index >= num_displays) {
+        return 0;
+    }
+
+    return display_index;
+}
+
+static bool get_configured_fullscreen_mode(SDL_DisplayMode *mode) {
+    if (configFullscreenDisplayMode == 0) {
+        return false;
+    }
+
+    return SDL_GetDisplayMode(get_display_index(), (int) configFullscreenDisplayMode - 1, mode) == 0;
+}
+
 static int8_t clamp_s8(long val) {
     if (val < -128) return -128;
     if (val > 127) return 127;
@@ -133,26 +152,21 @@ static void set_fullscreen(bool on, bool call_callback) {
 
     if (on) {
         SDL_DisplayMode mode;
-        if (configCustomFullscreenResolution) {
-            mode.format = SDL_PIXELFORMAT_ARGB8888;
-            mode.w = configFullscreenWidth;
-            mode.h = configFullscreenHeight;
-            mode.refresh_rate = configFullscreenRefreshRate;
-            mode.driverdata = 0;
+        bool has_custom_display_mode = get_configured_fullscreen_mode(&mode);
+
+        if (has_custom_display_mode) {
             SDL_SetWindowDisplayMode(wnd, &mode);
+            SDL_SetWindowSize(wnd, mode.w, mode.h);
+            SDL_SetWindowFullscreen(wnd, SDL_WINDOW_FULLSCREEN);
+        } else {
+            SDL_SetWindowDisplayMode(wnd, NULL);
+            SDL_GetDesktopDisplayMode(get_display_index(), &mode);
+            SDL_SetWindowSize(wnd, mode.w, mode.h);
+            SDL_SetWindowFullscreen(wnd, SDL_WINDOW_FULLSCREEN_DESKTOP);
         }
-        else {
-            SDL_GetDesktopDisplayMode(0, &mode);
-        }
-        SDL_SetWindowSize(wnd, mode.w, mode.h);
-        SDL_SetWindowFullscreen(wnd, configCustomFullscreenResolution ? SDL_WINDOW_FULLSCREEN : SDL_WINDOW_FULLSCREEN_DESKTOP);
         SDL_ShowCursor(false);
     } else {
-        if (configCustomFullscreenResolution) {
-            SDL_DisplayMode mode;
-            SDL_GetDesktopDisplayMode(0, &mode);
-            SDL_SetWindowDisplayMode(wnd, &mode);
-        }
+        SDL_SetWindowDisplayMode(wnd, NULL);
         SDL_SetWindowFullscreen(wnd, 0);
         SDL_SetWindowSize(wnd, window_width, window_height);
         SDL_ShowCursor(true);
@@ -235,6 +249,36 @@ static void gfx_sdl_set_fullscreen_changed_callback(void (*on_fullscreen_changed
 
 static void gfx_sdl_set_fullscreen(bool enable) {
     set_fullscreen(enable, true);
+}
+
+static void gfx_sdl_set_vsync(bool enable) {
+    SDL_GL_SetSwapInterval(enable ? 1 : 0);
+}
+
+static void gfx_sdl_set_window_size(uint32_t width, uint32_t height) {
+    window_width = width;
+    window_height = height;
+    if (!fullscreen_state) {
+        SDL_SetWindowSize(wnd, width, height);
+    }
+}
+
+static void gfx_sdl_set_monitor(uint32_t monitor_index) {
+    configDefaultMonitor = monitor_index;
+    int display_index = get_display_index();
+
+    if (!fullscreen_state) {
+        SDL_SetWindowPosition(wnd, SDL_WINDOWPOS_CENTERED_DISPLAY(display_index), SDL_WINDOWPOS_CENTERED_DISPLAY(display_index));
+    } else {
+        SDL_SetWindowFullscreen(wnd, 0);
+        SDL_SetWindowPosition(wnd, SDL_WINDOWPOS_CENTERED_DISPLAY(display_index), SDL_WINDOWPOS_CENTERED_DISPLAY(display_index));
+        fullscreen_state = false;
+        set_fullscreen(true, false);
+    }
+}
+
+static int gfx_sdl_get_num_display_modes(void) {
+    return SDL_GetNumDisplayModes(get_display_index());
 }
 
 static void gfx_sdl_set_keyboard_callbacks(bool (*on_key_down)(int scancode), bool (*on_key_up)(int scancode), void (*on_all_keys_up)(void), void (*on_mouse_move)(long x, long y), void (*on_mouse_press)(s8 left, s8 right, s8 middle, s8 wheel)) {
@@ -400,7 +444,7 @@ static void gfx_sdl_swap_buffers_end(void) {
 }
 
 static double gfx_sdl_get_time(void) {
-    return 0.0;
+    return (double)SDL_GetTicks64() / 1000.0;
 }
 
 struct GfxWindowManagerAPI gfx_sdl = {
@@ -408,6 +452,10 @@ struct GfxWindowManagerAPI gfx_sdl = {
     gfx_sdl_set_keyboard_callbacks,
     gfx_sdl_set_fullscreen_changed_callback,
     gfx_sdl_set_fullscreen,
+    gfx_sdl_set_vsync,
+    gfx_sdl_set_window_size,
+    gfx_sdl_set_monitor,
+    gfx_sdl_get_num_display_modes,
     gfx_sdl_main_loop,
     gfx_sdl_get_dimensions,
     gfx_sdl_handle_events,

@@ -158,9 +158,7 @@ unsigned int configDefaultMonitor = 1;
 s8 configVSync = 1;
 unsigned int configWindowWidth = 1280;
 unsigned int configWindowHeight = 720;
-unsigned int configCustomFullscreenResolution = 0;
-unsigned int configFullscreenWidth = 1920;
-unsigned int configFullscreenHeight = 1080;
+unsigned int configFullscreenDisplayMode = 0;
 unsigned int configGraphicsBackend = 0;
 
 // AUDIO
@@ -293,7 +291,6 @@ s8 configDisableLighting = 0;
 
 // ADVANCED
 s8 configBlockNonXinputControllers = 0;
-unsigned int configFullscreenRefreshRate = 60;
 float configCustomCameraDistance = 100.0f;
 float configCustomCameraDistanceZoomedOut = 150.0f;
 

@@ -1,6 +1,8 @@
 #ifndef CONTROLLER_SDL_H
 #define CONTROLLER_SDL_H
 
+#include <PR/ultratypes.h>
+
 #include "controller_api.h"
 
 extern struct ControllerAPI controller_sdl;

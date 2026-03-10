@@ -104,17 +104,31 @@ static GLint blur_position_location = -1;
 static GLint blur_texcoord_location = -1;
 static GLint blur_screen_width_location = -1;
 
+static int get_display_index(void) {
+    int display_index = (int) configDefaultMonitor - 1;
+    int num_displays = SDL_GetNumVideoDisplays();
+
+    if (display_index < 0 || display_index >= num_displays) {
+        return 0;
+    }
+
+    return display_index;
+}
+
 // Get display dimensions based on fullscreen/windowed mode
 static void get_display_dimensions(uint32_t *width, uint32_t *height) {
     if (configFullscreen) {
-        if (configCustomFullscreenResolution) {
-            *width = configFullscreenWidth;
-            *height = configFullscreenHeight;
+        SDL_DisplayMode mode;
+        int display_index = get_display_index();
+
+        if (configFullscreenDisplayMode > 0 &&
+            SDL_GetDisplayMode(display_index, (int) configFullscreenDisplayMode - 1, &mode) == 0) {
+            *width = mode.w;
+            *height = mode.h;
             return;
         }
-        
-        SDL_DisplayMode mode;
-        if (SDL_GetCurrentDisplayMode(0, &mode) == 0) {
+
+        if (SDL_GetDesktopDisplayMode(display_index, &mode) == 0) {
             *width = mode.w;
             *height = mode.h;
             return;

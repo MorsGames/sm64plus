@@ -8,9 +8,7 @@ extern unsigned int configDefaultMonitor;
 extern s8 configVSync;
 extern unsigned int configWindowWidth;
 extern unsigned int configWindowHeight;
-extern s8 configCustomFullscreenResolution;
-extern unsigned int configFullscreenWidth;
-extern unsigned int configFullscreenHeight;
+extern unsigned int configFullscreenDisplayMode;
 extern unsigned int configGraphicsBackend;
 
 // AUDIO
@@ -143,7 +141,6 @@ extern s8 configDisableLighting;
 
 // ADVANCED
 extern s8 configBlockNonXinputControllers;
-extern unsigned int configFullscreenRefreshRate;
 extern float configCustomCameraDistance;
 extern float configCustomCameraDistanceZoomedOut;
 

@@ -108,6 +108,18 @@ static void patch_interpolations(void) {
     patch_interpolated_snow_particles();
 }
 
+static void submit_audio_frame(void) {
+    int samples_left = audio_api->buffered();
+    u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
+    s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
+
+    for (int i = 0; i < 2; i++) {
+        create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
+    }
+
+    audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
+}
+
 void produce_one_frame(void) {
     gfx_start_frame();
     game_loop_one_iteration();
@@ -116,19 +128,7 @@ void produce_one_frame(void) {
     thread6_rumble_loop(NULL);
 #endif
     
-    int samples_left = audio_api->buffered();
-    u32 num_audio_samples = samples_left < audio_api->get_desired_buffered() ? SAMPLES_HIGH : SAMPLES_LOW;
-    //printf("Audio samples: %d %u\n", samples_left, num_audio_samples);
-    s16 audio_buffer[SAMPLES_HIGH * 2 * 2];
-    for (int i = 0; i < 2; i++) {
-        /*if (audio_cnt-- == 0) {
-            audio_cnt = 2;
-        }
-        u32 num_audio_samples = audio_cnt < 2 ? 528 : 544;*/
-        create_next_audio_buffer(audio_buffer + i * (num_audio_samples * 2), num_audio_samples);
-    }
-    //printf("Audio samples before submitting: %d\n", audio_api->buffered());
-    audio_api->play((u8 *)audio_buffer, 2 * num_audio_samples * 4);
+    submit_audio_frame();
     
     gfx_end_frame();
     
@@ -242,17 +242,8 @@ void main_func(const char* gfx_dir) {
     request_anim_frame(on_anim_frame);
 #endif
 
-    switch (configGraphicsBackend)
-    {
-    case -1:
-        rendering_api = &gfx_dummy_renderer_api;
-        wm_api = &gfx_dummy_wm_api;
-        break;
-    default:
-        rendering_api = &gfx_opengl_api;
-        wm_api = &gfx_sdl;
-        break;
-    }
+    rendering_api = &gfx_opengl_api;
+    wm_api = &gfx_sdl;
     gfx_init(wm_api, rendering_api, gTitleString, configFullscreen);
     
     wm_api->set_fullscreen_changed_callback(on_fullscreen_changed);
