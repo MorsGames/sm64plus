@@ -219,6 +219,7 @@ namespace tfm = tinyformat;
 
 #ifndef TINYFORMAT_ERROR
 #   include <cassert>
+#   include <cstdint>
 #   define TINYFORMAT_ERROR(reason) assert(0 && reason)
 #endif
 
