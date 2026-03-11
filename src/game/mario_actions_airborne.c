@@ -1028,7 +1028,7 @@ s32 act_ground_pound(struct MarioState *m) {
 
     if (m->actionState == 0) {
 
-        if (configFixExploits) {
+        if (configApplyBugFixes > 2) {
             m->vel[1]  = 0.0f;
             stepResult = perform_air_step(m, 0);
         }

@@ -89,7 +89,15 @@ void yoshi_talk_loop(void) {
         }
     } else {
         cur_obj_init_animation(1);
-        play_puzzle_jingle();
+        if (configApplyBugFixes) {
+            if (o->oSubAction == 0) {
+                play_puzzle_jingle();
+                o->oSubAction = 1;
+            }
+        }
+        else {
+            play_puzzle_jingle();
+        }
         o->oMoveAngleYaw = approach_s16_symmetric(o->oMoveAngleYaw, o->oAngleToMario, 0x500);
     }
 }

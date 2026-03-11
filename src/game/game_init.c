@@ -125,7 +125,7 @@ void init_rdp(void) {
     gDPSetTextureLUT(gDisplayListHead++, G_TT_NONE);
     gDPSetTextureDetail(gDisplayListHead++, G_TD_CLAMP);
     gDPSetTexturePersp(gDisplayListHead++, G_TP_PERSP);
-    if (configTextureFiltering) {
+    if (configTextureFiltering > -1) {
         gDPSetTextureFilter(gDisplayListHead++, G_TF_BILERP);
     }
     else {
@@ -224,7 +224,7 @@ void clear_viewport(Vp *viewport, s32 color) {
     s16 vpLry = (viewport->vp.vtrans[1] + viewport->vp.vscale[1]) / 4 - 2;
 
 #ifdef WIDESCREEN
-    if (!configForce4by3) {
+    if (configAspectRatio != 1) {
         vpUlx = GFX_DIMENSIONS_RECT_FROM_LEFT_EDGE(vpUlx);
         vpLrx = GFX_DIMENSIONS_RECT_FROM_RIGHT_EDGE(SCREEN_WIDTH - vpLrx);
     }

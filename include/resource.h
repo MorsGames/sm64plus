@@ -1,1 +1,2 @@
 #define STAR_ICON 640
+#define RT_MANIFEST 24

@@ -21,6 +21,19 @@ static void gfx_dummy_wm_set_fullscreen_changed_callback(void (*on_fullscreen_ch
 static void gfx_dummy_wm_set_fullscreen(bool enable) {
 }
 
+static void gfx_dummy_wm_set_vsync(bool enable) {
+}
+
+static void gfx_dummy_wm_set_window_size(uint32_t width, uint32_t height) {
+}
+
+static void gfx_dummy_wm_set_monitor(uint32_t monitor_index) {
+}
+
+static int gfx_dummy_wm_get_num_display_modes(void) {
+    return 0;
+}
+
 static void gfx_dummy_wm_main_loop(void (*run_one_game_iter)(void)) {
     while (1) {
         run_one_game_iter();
@@ -158,6 +171,10 @@ struct GfxWindowManagerAPI gfx_dummy_wm_api = {
     gfx_dummy_wm_set_keyboard_callbacks,
     gfx_dummy_wm_set_fullscreen_changed_callback,
     gfx_dummy_wm_set_fullscreen,
+    gfx_dummy_wm_set_vsync,
+    gfx_dummy_wm_set_window_size,
+    gfx_dummy_wm_set_monitor,
+    gfx_dummy_wm_get_num_display_modes,
     gfx_dummy_wm_main_loop,
     gfx_dummy_wm_get_dimensions,
     gfx_dummy_wm_handle_events,

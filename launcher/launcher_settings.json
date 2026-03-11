@@ -25,21 +25,21 @@
     "disabled_by": -1,
     "name": "Default Window Height"
   }, {
-    "internal_name": "mute_sounds",
-    "description": "Mutes the launcher sounds. Can be toggled via the \"Alt + S\" key combo.",
-    "os": OS_ANY,
-    "type": TYPE_BOOL,
+    "internal_name": "music_volume",
+    "description": "Sets the volume of the launcher music. Can be toggled via the \"Alt + M\" key combo.",
+    "os": "OS_ANY",
+    "type": "TYPE_PERCENTAGE",
     "enabled_by": -1,
     "disabled_by": -1,
-    "name": "Mute Sounds"
+    "name": "Music Volume"
   }, {
-    "internal_name": "mute_music",
-    "description": "Mutes the launcher music. Can be toggled via the \"Alt + M\" key combo.",
-    "os": OS_ANY,
-    "type": TYPE_BOOL,
+    "internal_name": "sound_volume",
+    "description": "Sets the volume of the launcher sounds. Can be toggled via the \"Alt + S\" key combo.",
+    "os": "OS_ANY",
+    "type": "TYPE_PERCENTAGE",
     "enabled_by": -1,
     "disabled_by": -1,
-    "name": "Mute Music"
+    "name": "Sound Volume"
   }, {
     "internal_name": "quick_launch",
     "description": "Makes the game boot automatically after opening the launcher. You can press the <Backspace> key or the (Select) button in the disclaimer screen to go to the launcher menu.",
@@ -58,6 +58,5 @@
     "name": "Close on Launch"
   }],
   "hidden": false,
-  "reload_with_preset": false,
   "os": OS_ANY
 }

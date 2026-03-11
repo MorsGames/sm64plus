@@ -1,5 +1,6 @@
 #include <ultra64.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "actors/common1.h"
 #include "area.h"
@@ -120,6 +121,141 @@ static Gfx *sInterpolatedDialogRotationPos;
 static f32 sInterpolatedDialogScale;
 static f32 sInterpolatedDialogRotation;
 static Gfx *sInterpolatedDialogZoomPos;
+
+// Text fixes. I'm sorry for what you're about to see.
+static void copy_dialog_text(u8 *dst, const u8 *src, s16 *outLen, s16 dstSize) {
+    s16 n = 0;
+    if (dstSize <= 0) {
+        if (outLen) {
+            *outLen = 0;
+        }
+        return;
+    }
+    while (src[n] != DIALOG_CHAR_TERMINATOR && n < (dstSize - 1)) {
+        dst[n] = src[n];
+        n++;
+    }
+    dst[n] = DIALOG_CHAR_TERMINATOR;
+    if (outLen) {
+        *outLen = n;
+    }
+}
+
+// "It that " -> "Is that "
+static void fix_yoshi_typo(u8 *buf, s16 *pLen) {
+    static const u8 pat[] = { ASCII_TO_DIALOG('I'), ASCII_TO_DIALOG('t'), DIALOG_CHAR_SPACE,
+                              ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('h'), ASCII_TO_DIALOG('a'), ASCII_TO_DIALOG('t'), DIALOG_CHAR_SPACE };
+    s16 len = *pLen;
+    for (s16 i = 0; i + (s16)sizeof(pat) <= len; i++) {
+        if (memcmp(&buf[i], pat, sizeof(pat)) == 0) {
+            buf[i + 1] = ASCII_TO_DIALOG('s');
+            return;
+        }
+    }
+}
+
+// "run in to " -> "run into "
+static void fix_run_into(u8 *buf, s16 *pLen) {
+    static const u8 pat[] = { ASCII_TO_DIALOG('r'), ASCII_TO_DIALOG('u'), ASCII_TO_DIALOG('n'), DIALOG_CHAR_SPACE,
+                              ASCII_TO_DIALOG('i'), ASCII_TO_DIALOG('n'), DIALOG_CHAR_SPACE,
+                              ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('o'), DIALOG_CHAR_SPACE };
+    s16 len = *pLen;
+    for (s16 i = 0; i + (s16)sizeof(pat) <= len; i++) {
+        if (memcmp(&buf[i], pat, sizeof(pat)) == 0) {
+            s16 src = i + 7; // Position of "t" in "to "
+            s16 dst = i + 6; // Overwrite the extra space
+            s16 tailLen = len - src + 1; // Move the rest of the string, INCLUDING THE TERMINATOR!!!
+            memmove(&buf[dst], &buf[src], tailLen);
+            *pLen -= 1;
+            return;
+        }
+    }
+}
+
+// "Pull back to\n
+// to fly up, press forward\n
+// to nose down, and press [Z]\n
+// to land."
+// 
+// ->
+// 
+// "Pull back to\n
+// fly up, press forward to\n
+// nose down, and press [Z] to\n
+// land."
+static void fix_wing_cap_tip(u8 *buf, s16 *pLen) {
+    static const u8 lead[] = { ASCII_TO_DIALOG('P'), ASCII_TO_DIALOG('u'), ASCII_TO_DIALOG('l'), ASCII_TO_DIALOG('l'), DIALOG_CHAR_SPACE,
+                               ASCII_TO_DIALOG('b'), ASCII_TO_DIALOG('a'), ASCII_TO_DIALOG('c'), ASCII_TO_DIALOG('k'), DIALOG_CHAR_SPACE,
+                               ASCII_TO_DIALOG('t'), ASCII_TO_DIALOG('o'), DIALOG_CHAR_NEWLINE };
+    s16 len = *pLen;
+    for (s16 p = 0; p + (s16)sizeof(lead) <= len; p++) {
+
+        if (memcmp(&buf[p], lead, sizeof(lead)) != 0) {
+            continue;
+        }
+
+        s16 line2 = p + (s16)sizeof(lead);
+        if (line2 + 2 < len &&
+            buf[line2    ] == ASCII_TO_DIALOG('t') &&
+            buf[line2 + 1] == ASCII_TO_DIALOG('o') &&
+            buf[line2 + 2] == DIALOG_CHAR_SPACE) {
+            memmove(&buf[line2], &buf[line2 + 3], len - (line2 + 2));
+            len -= 3;
+        }
+        s16 end2 = line2;
+        while (end2 < len && buf[end2] != DIALOG_CHAR_NEWLINE) {
+            end2++;
+        }
+        if (end2 >= len) {
+            break;
+        }
+        memmove(&buf[end2 + 3], &buf[end2], len - end2 + 1);
+        buf[end2 + 0] = DIALOG_CHAR_SPACE;
+        buf[end2 + 1] = ASCII_TO_DIALOG('t');
+        buf[end2 + 2] = ASCII_TO_DIALOG('o');
+        len += 3;
+
+        s16 line3 = end2 + 4;
+        s16 m = line3;
+        while (m < len && buf[m] == DIALOG_CHAR_SPACE) {
+            m++;
+        }
+        if (m + 2 < len &&
+            buf[m    ] == ASCII_TO_DIALOG('t') &&
+            buf[m + 1] == ASCII_TO_DIALOG('o') &&
+            buf[m + 2] == DIALOG_CHAR_SPACE) {
+            memmove(&buf[m], &buf[m + 3], len - (m + 2));
+            len -= 3;
+        }
+        s16 end3 = m;
+        while (end3 < len && buf[end3] != DIALOG_CHAR_NEWLINE) {
+            end3++;
+        }
+        if (end3 >= len) {
+            break;
+        }
+        memmove(&buf[end3 + 3], &buf[end3], len - end3 + 1);
+        buf[end3 + 0] = DIALOG_CHAR_SPACE;
+        buf[end3 + 1] = ASCII_TO_DIALOG('t');
+        buf[end3 + 2] = ASCII_TO_DIALOG('o');
+        len += 3;
+
+        s16 line4 = end3 + 4;
+        s16 n = line4;
+        while (n < len && buf[n] == DIALOG_CHAR_SPACE) {
+            n++;
+        }
+        if (n + 2 < len &&
+            buf[n    ] == ASCII_TO_DIALOG('t') &&
+            buf[n + 1] == ASCII_TO_DIALOG('o') &&
+            buf[n + 2] == DIALOG_CHAR_SPACE) {
+            memmove(&buf[n], &buf[n + 3], len - (n + 2));
+            len -= 3;
+        }
+        *pLen = len;
+        return;
+    }
+}
 
 void patch_interpolated_dialog(void) {
     Mtx *matrix;
@@ -1328,6 +1464,17 @@ void handle_dialog_text_and_pages(s8 colorMode, struct DialogEntry *dialog, s8 l
     u8 strChar;
 
     u8 *str = segmented_to_virtual(dialog->str);
+
+    if (configFixTextTypos) {
+        static u8 sDialogPatchedBuf[2048];
+        s16 lenCopy = 0;
+        copy_dialog_text(sDialogPatchedBuf, str, &lenCopy, (s16)sizeof(sDialogPatchedBuf));
+        fix_wing_cap_tip(sDialogPatchedBuf, &lenCopy);
+        fix_yoshi_typo(sDialogPatchedBuf, &lenCopy);
+        fix_run_into(sDialogPatchedBuf, &lenCopy);
+        str = sDialogPatchedBuf;
+    }
+
     s8 lineNum = 1;
 
     s8 totalLines;
@@ -2394,12 +2541,7 @@ void render_pause_my_score_coins(void) {
     gDPSetEnvColor(gDisplayListHead++, 255, 255, 255, gDialogTextAlpha);
 
     if (courseIndex < COURSE_STAGES_COUNT && save_file_get_course_star_count(gCurrSaveFileNum - 1, courseIndex) != 0) {
-        if (get_mirror()) {
-            print_generic_string(280-MYSCORE_X, 121, textMyScore);
-        }
-        else {
-            print_generic_string(MYSCORE_X, 121, textMyScore);
-        }
+        print_generic_string(MYSCORE_X, 121, textMyScore);
     }
 
     courseName = segmented_to_virtual(courseNameTbl[courseIndex]);

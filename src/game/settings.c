@@ -152,30 +152,32 @@
 
 char* gTitleString = "Super Mario 64 Plus";
 
+// DISPLAY
 s8 configFullscreen = 1;
 unsigned int configDefaultMonitor = 1;
+s8 configVSync = 1;
 unsigned int configWindowWidth = 1280;
 unsigned int configWindowHeight = 720;
-unsigned int configCustomFullscreenResolution = 0;
-unsigned int configFullscreenWidth = 1920;
-unsigned int configFullscreenHeight = 1080;
-#if defined(_WIN32) || defined(_WIN64)
-s8 configCustomInternalResolution = 0;
-unsigned int configInternalResolutionWidth = 3840;
-unsigned int configInternalResolutionHeight = 2160;
-#endif
+unsigned int configFullscreenDisplayMode = 0;
 unsigned int configGraphicsBackend = 0;
 
+// AUDIO
 float configOverallVolume = 1;
 float configSeqVolume[] = {1, 1, 1};
 
+// GRAPHICS
+float configInternalResolution = 0.0f;
+unsigned int configAspectRatio = 0;
 unsigned int configFrameRate = 1;
+unsigned int configAntiAliasing = 8;
 float configDrawDistanceMultiplier = 0.0f;
 unsigned int configLevelOfDetail = 2;
-unsigned int configTextureFiltering = 2;
+int configTextureFiltering = 0;
+unsigned int configAnisotropicFiltering = 16;
 unsigned int configNoiseType = 0;
-s8 configForce4by3 = 0;
+s8 configN64Blur = 0;
 
+// CONTROLS
 s8 configImprovedControls = 1;
 s8 configImprovedSwimming = 1;
 s8 configImprovedHanging = 1;
@@ -183,6 +185,7 @@ s8 configEnemyBouncing = 1;
 s8 configDpadControls = 1;
 s8 configFullAirControl = 0;
 
+// GAMEPLAY
 unsigned int configApplyBugFixes = 1;
 s8 configSaveLives = 1;
 s8 configRespawnCertainItems = 1;
@@ -194,19 +197,20 @@ s8 configBetterBlastAwayTheWall = 1;
 s8 configBringMipsBack = 1;
 s8 configDisableFallDamage = 0;
 s8 configLeaveAnyTime = 0;
-s8 configVisibleSecrets = 0;
-s8 configFixExploits = 0;
 
+// PROGRESSION
 s8 configBowsersSub = 1;
 unsigned int configStayInCourse = 0;
 s8 configSkipMissionSelect = 0;
 s8 configSwitchToNextMission = 0;
 s8 configSkipCutscenes = 0;
 
+// CAMERA
 unsigned int configDefaultCameraMode = 0;
 unsigned int configAlternateCameraMode = 2;
 s8 configImprovedCamera = 1;
 s8 configVerticalCamera = 1;
+s8 configImprovedCButtonCamera = 1;
 s8 configCenterCameraButton = 1;
 s8 configInvertedCamera = 0;
 s8 configInvertedVerticalCamera = 0;
@@ -214,6 +218,8 @@ float configCameraSpeed = 32.0f;
 float configAdditionalCameraDistance = 0.0f;
 float configAdditionalFOV = 0.0f;
 
+// HUD AND UI
+s8 configFixTextTypos = 1;
 s8 configQuitOption = 1;
 unsigned int configHudLayout = 2;
 s8 config4by3Hud = 0;
@@ -224,14 +230,7 @@ s8 configAlwaysShowHealth = 0;
 s8 configHUDFiltering = 0;
 s8 configHideHud = 0;
 
-s8 configMouseCam = 1;
-float configMouseSensitivity = 4.0f;
-unsigned int configMouseLeft = A_BUTTON;
-unsigned int configMouseRight = B_BUTTON;
-unsigned int configMouseMiddle = Z_TRIG;
-unsigned int configMouseWheelUp = U_CBUTTONS;
-unsigned int configMouseWheelDown = D_CBUTTONS;
-
+// EXTRA MOVES
 s8 configWallSliding = 1;
 s8 configGroundPoundJump = 0;
 s8 configSunshineDive = 0;
@@ -239,6 +238,7 @@ s8 configOdysseyDive = 0;
 s8 configRolling = 0;
 s8 configFlashbackGroundPound = 0;
 
+// RESTORATIONS
 s8 configUnusedPyramidCutscene = 1;
 s8 configRestoreUnusedSounds = 1;
 s8 configPenguinSadEyes = 1;
@@ -247,6 +247,8 @@ s8 configBetaLikeCamera = 0;
 s8 configSpawnSparkles = 0;
 s8 configReplaceKeysWithStars = 0;
 
+// BONUS MODES
+s8 configCasualMode = 0;
 unsigned int configLifeMode = 0;
 unsigned int configEncoreMode = 0;
 unsigned int configGreenDemon = 0;
@@ -254,31 +256,10 @@ s8 configNoHealingMode = 0;
 s8 configHardSave = 0;
 s8 configDaredevilSave = 0;
 s8 configHardcoreSave = 0;
-s8 configCasualMode = 0;
 s8 configInvisibleMode = 0;
 
-s8 configDebugMovementMode = 0;
-s8 configDebugCapChanger = 0;
-s8 configDebugObjectSpawner = 0;
-unsigned int configMoonJump = 0;
-s8 configEasyBowserThrows = 0;
-unsigned int configBLJEverywhere = 0;
-s8 configGodMode = 0;
-s8 configHyperspeedMode = 0;
-s8 configFlexibleCannons = 0;
-unsigned int configCoinStarCoins = 100;
-
-s8 configRockPaperScissors = 0;
-s8 configAngryPenguin = 0;
-s8 configPaperMode = 0;
-s8 configFXMode = 0;
-#if defined(_WIN32) || defined(_WIN64)
-s8 configWireframeMode = 0;
-#endif
-s8 configDisableLighting = 0;
-
+// COLORS
 unsigned int configColorPalette = 2;
-
 unsigned int configColorCap[2][3];
 unsigned int configColorShirt[2][3];
 unsigned int configColorOveralls[2][3];
@@ -286,13 +267,34 @@ unsigned int configColorGloves[2][3];
 unsigned int configColorShoes[2][3];
 unsigned int configColorSkin[2][3];
 unsigned int configColorHair[2][3];
-
 s8 configShowCapLogo = 1;
 
-unsigned int configFullscreenRefreshRate = 60;
+// CHEATS
+s8 configDebugMovementMode = 0;
+s8 configDebugCapChanger = 0;
+s8 configDebugObjectSpawner = 0;
+unsigned int configMoonJump = 0;
+unsigned int configBLJEverywhere = 0;
+s8 configGodMode = 0;
+s8 configHyperspeedMode = 0;
+s8 configEasyBowserThrows = 0;
+s8 configVisibleSecrets = 0;
+s8 configFlexibleCannons = 0;
+unsigned int configCoinStarCoins = 100;
+
+// FOR FUN
+s8 configRockPaperScissors = 0;
+s8 configAngryPenguin = 0;
+s8 configPaperMode = 0;
+s8 configFXMode = 0;
+s8 configDisableLighting = 0;
+
+// ADVANCED
+s8 configBlockNonXinputControllers = 0;
 float configCustomCameraDistance = 100.0f;
 float configCustomCameraDistanceZoomedOut = 150.0f;
 
+// CONTROLLER MAPPING
 unsigned int configButtonA = 2;
 unsigned int configButtonB = 8;
 unsigned int configButtonStart = 128;
@@ -307,6 +309,7 @@ unsigned int gControllerLeftDeadzone = 512;
 unsigned int gControllerRightDeadzone = 512;
 float configRumbleStrength = 0.25f;
 
+// KEYBOARD MAPPING
 unsigned int configKeyA = DIK_L;
 unsigned int configKeyB = DIK_COMMA;
 unsigned int configKeyStart = DIK_SPACE;
@@ -322,6 +325,15 @@ unsigned int configKeyStickDown = DIK_S;
 unsigned int configKeyStickLeft = DIK_A;
 unsigned int configKeyStickRight = DIK_D;
 unsigned int configKeyWalk = DIK_LSHIFT;
+
+// MOUSE
+s8 configMouseCam = 1;
+float configMouseSensitivity = 4.0f;
+unsigned int configMouseLeft = A_BUTTON;
+unsigned int configMouseRight = B_BUTTON;
+unsigned int configMouseMiddle = Z_TRIG;
+unsigned int configMouseWheelUp = U_CBUTTONS;
+unsigned int configMouseWheelDown = D_CBUTTONS;
 
 // These probably don't belong here, but I don't have a better place for them at the moment.
 // TODO (Mors): Move this out to somewhere that fits.

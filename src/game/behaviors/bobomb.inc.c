@@ -30,7 +30,7 @@ void bobomb_spawn_coin(void) {
 void bobomb_act_explode(void) {
     struct Object *explosion;
 
-    if (configFixExploits)
+    if (configApplyBugFixes > 2)
         cur_obj_become_intangible();
 
     if (o->oTimer < 5)
@@ -104,7 +104,7 @@ void bobomb_act_chase_mario(void) {
 void bobomb_act_launched(void) {
     s16 collisionFlags = 0;
 
-    if (configFixExploits)
+    if (configApplyBugFixes > 2)
         cur_obj_become_intangible();
 
     collisionFlags = object_step();
@@ -193,7 +193,7 @@ void bobomb_held_loop(void) {
         //  This allows the Bob-omb to be regrabbed indefinitely.
         gMarioObject->oInteractStatus |= INT_STATUS_MARIO_DROP_OBJECT;
         o->oAction = BOBOMB_ACT_EXPLODE;
-        if (configFixExploits)
+        if (configApplyBugFixes > 2)
             bobomb_act_explode();
     }
 }

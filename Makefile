@@ -467,9 +467,6 @@ SDLCONFIG_CFLAGS := $(shell sdl2-config --cflags)
 
 # Static linking is broken on Windows for some reason so we will roll like this for now
 ifeq ($(TARGET_WINDOWS),1)
-  ifeq ($(TARGET_32BIT),0)
-    PLATFORM_LDFLAGS := -o sm64plus icon.res
-  endif
   SDLCONFIG_LDFLAGS := -Wl,-Bdynamic $(shell sdl2-config --libs) -Wl,-Bstatic -Llib
   PLATFORM_CFLAGS  := $(SDLCONFIG_CFLAGS) -DTARGET_WINDOWS
   PLATFORM_LDFLAGS := $(SDLCONFIG_LDFLAGS) -static -lm -no-pie -mwindows -w
@@ -595,6 +592,7 @@ ifeq ($(COMPARE),1)
 endif
 else
 all: $(EXE)
+	@cp -f gamecontrollerdb.txt $(BUILD_DIR)/gamecontrollerdb.txt
 ifeq ($(CUSTOM_TEXTURES),1)
 	@mkdir -p $(BUILD_DIR)/gfx
 	@cp -r -f textures $(BUILD_DIR)/gfx/
@@ -611,6 +609,9 @@ endif
 
 clean:
 	$(RM) -r $(BUILD_DIR_BASE)
+ifeq ($(TARGET_WINDOWS),1)
+	$(RM) icon.o
+endif
 
 distclean: clean
 	$(PYTHON) extract_assets.py --clean
@@ -968,18 +969,31 @@ $(BUILD_DIR)/$(TARGET).objdump: $(ELF)
 	$(OBJDUMP) -D $< > $@
 
 else
+ifeq ($(TARGET_WINDOWS),1)
+$(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(ULTRA_O_FILES) $(GODDARD_O_FILES) icon.o
+	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) icon.o $(LDFLAGS)
+else
 $(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
 	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS)
+endif
 
   # Copying the dynamically linked DLL files (Windows only)
   ifeq ($(TARGET_WINDOWS),1)
 	$(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/SDL2.dll" "$(BUILD_DIR)/SDL2.dll")
 
   ifeq ($(TARGET_32BIT),1)
-	  $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libgcc_s_dw2-1.dll" "$(BUILD_DIR)/libgcc_s_dw2-1.dll")
-	  $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libwinpthread-1.dll" "$(BUILD_DIR)/libwinpthread-1.dll")
+    $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libgcc_s_dw2-1.dll" "$(BUILD_DIR)/libgcc_s_dw2-1.dll")
+    $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libwinpthread-1.dll" "$(BUILD_DIR)/libwinpthread-1.dll")
   endif
   endif
+  endif
+endif
+
+# Resource compilation
+ifeq ($(TARGET_WINDOWS),1)
+icon.o: icon.rc include/resource.h sm64plus.manifest star.ico
+	$(call print,Compiling resources:,$<,$@)
+	$(V)windres -i $< -o $@
 endif
 
 .PHONY: all clean distclean default diff test load libultra

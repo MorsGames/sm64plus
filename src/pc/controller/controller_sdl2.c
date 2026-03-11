@@ -12,6 +12,7 @@
 #include <ultra64.h>
 
 #include "controller_api.h"
+#include "controller_sdl.h"
 
 #include "game/settings.h"
 
@@ -27,16 +28,101 @@ static bool init_ok;
 static SDL_GameController *sdl_cntrl;
 static bool haptics_enabled;
 static SDL_Haptic *sdl_haptic;
+static SDL_Haptic *controller_sdl_init_haptics(const int joy);
+
+static void controller_sdl_ensure_open(void) {
+    if (!init_ok) {
+        return;
+    }
+
+    SDL_GameControllerUpdate();
+
+    if (sdl_cntrl != NULL && !SDL_GameControllerGetAttached(sdl_cntrl)) {
+        SDL_HapticClose(sdl_haptic);
+        SDL_GameControllerClose(sdl_cntrl);
+        sdl_cntrl = NULL;
+        sdl_haptic = NULL;
+    }
+
+    if (sdl_cntrl == NULL) {
+        for (int i = 0; i < SDL_NumJoysticks(); i++) {
+            if (SDL_IsGameController(i)) {
+                sdl_cntrl = SDL_GameControllerOpen(i);
+                if (sdl_cntrl != NULL) {
+                    sdl_haptic = controller_sdl_init_haptics(i);
+                    break;
+                }
+            }
+        }
+    }
+}
+
+static u32 controller_sdl_get_raw_buttons(void) {
+    int16_t ltrig;
+    int16_t rtrig;
+    u32 pressedButtons = 0;
+
+    if (!init_ok || sdl_cntrl == NULL) {
+        return 0;
+    }
+
+    ltrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
+    rtrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
+
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_START);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_BACK);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_A);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_B);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_X);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_Y);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_LEFTSTICK);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_RIGHTSTICK);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_UP);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
+    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
+    if (ltrig > 30 * 256) pressedButtons |= 1 << 22;
+    if (rtrig > 30 * 256) pressedButtons |= 1 << 23;
+
+    return pressedButtons;
+}
 
 static void controller_sdl_init(void) {
+#if defined(_WIN32) || defined(_WIN64)
+    if (configBlockNonXinputControllers) {
+        // Prioritize XInput by disabling other joystick backends.
+        SDL_SetHint(SDL_HINT_JOYSTICK_RAWINPUT, "0");
+        SDL_SetHint(SDL_HINT_JOYSTICK_HIDAPI, "0");
+    }
+#endif
     
-    SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt");
     if (SDL_Init(SDL_INIT_GAMECONTROLLER) != 0) {
         fprintf(stderr, "SDL init error: %s\n", SDL_GetError());
         return;
     }
 
+    int added = -1;
+    char *basePath = SDL_GetBasePath();
+    if (basePath != NULL) {
+        char dbPath[4096];
+        snprintf(dbPath, sizeof(dbPath), "%sgamecontrollerdb.txt", basePath);
+        added = SDL_GameControllerAddMappingsFromFile(dbPath);
+        SDL_free(basePath);
+    }
+    
+    // Also try the current working directory just in case
+    if (added < 0) {
+        if (SDL_GameControllerAddMappingsFromFile("gamecontrollerdb.txt") < 0) {
+            printf("Failed to load gamecontrollerdb.txt: %s\n", SDL_GetError());
+        }
+    }
+
     haptics_enabled = (SDL_InitSubSystem(SDL_INIT_HAPTIC) == 0);
+    if (!haptics_enabled) {
+        printf("Haptic init failed (ignoring): %s\n", SDL_GetError());
+    }
 
     init_ok = true;
 }
@@ -66,51 +152,14 @@ static void controller_sdl_read(OSContPad *pad) {
         return;
     }
 
-    SDL_GameControllerUpdate();
-
-    if (sdl_cntrl != NULL && !SDL_GameControllerGetAttached(sdl_cntrl)) {
-        SDL_HapticClose(sdl_haptic);
-        SDL_GameControllerClose(sdl_cntrl);
-        sdl_cntrl = NULL;
-        sdl_haptic = NULL;
-    }
-
+    controller_sdl_ensure_open();
     if (sdl_cntrl == NULL) {
-        for (int i = 0; i < SDL_NumJoysticks(); i++) {
-            if (SDL_IsGameController(i)) {
-                sdl_cntrl = SDL_GameControllerOpen(i);
-                if (sdl_cntrl != NULL) {
-                    sdl_haptic = controller_sdl_init_haptics(i);
-                    break;
-                }
-            }
-        }
         if (sdl_cntrl == NULL) {
             return;
         }
     }
 
-    int16_t ltrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERLEFT);
-    int16_t rtrig = SDL_GameControllerGetAxis(sdl_cntrl, SDL_CONTROLLER_AXIS_TRIGGERRIGHT);
-
-    int pressedButtons = 0;
-
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_START);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_BACK);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_LEFTSHOULDER);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_RIGHTSHOULDER);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_A);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_B);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_X);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_Y);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_LEFTSTICK);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_RIGHTSTICK);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_UP);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_DOWN);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_LEFT);
-    SET_BUTTON(SDL_CONTROLLER_BUTTON_DPAD_RIGHT);
-    if (ltrig > 30 * 256) pressedButtons |= 1 << 22;
-    if (rtrig > 30 * 256) pressedButtons |= 1 << 23;
+    u32 pressedButtons = controller_sdl_get_raw_buttons();
 
     CHECK_BUTTON(configButtonA, A_BUTTON);
     CHECK_BUTTON(configButtonB, B_BUTTON);

@@ -10,15 +10,23 @@
         "name": "Fullscreen"
     }, {
         "internal_name": "default_monitor",
-        "description": "The monitor the game renders on in the fullscreen mode.",
+        "description": "Sets the monitor the game appears on in fullscreen mode.",
         "os": OS_ANY,
         "type": TYPE_MONITOR,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Default Monitor"
     }, {
+        "internal_name": "vsync",
+        "description": "Toggles VSync to prevent screen tearing. Disabling this might result in a smoother perceived frame rate, but at the cost of screen tearing.",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "VSync"
+    }, {
         "internal_name": "window_width",
-        "description": "Default width of the game window in pixels.",
+        "description": "Sets the default width of the game window in pixels.",
         "os": OS_ANY,
         "type": TYPE_WINDOW_SIZE,
         "enabled_by": -1,
@@ -26,85 +34,28 @@
         "name": "Default Window Width"
     }, {
         "internal_name": "window_height",
-        "description": "Default height of the game window in pixels.",
+        "description": "Sets the default height of the game window in pixels.",
         "os": OS_ANY,
         "type": TYPE_WINDOW_SIZE,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Default Window Height"
     }, {
-        "internal_name": "custom_fullscreen_resolution",
-        "description": "Allows you to set a custom screen resolution for the fullscreen mode.",
+        "internal_name": "fullscreen_display_mode",
+        "description": "Sets the display mode for the fullscreen mode.",
         "os": OS_ANY,
-        "type": TYPE_BOOL,
+        "type": TYPE_DISPLAY_MODE,
         "enabled_by": -1,
         "disabled_by": -1,
-        "name": "Custom Fullscreen Resolution"
-    }, {
-        "internal_name": "fullscreen_width",
-        "description": "Width of the custom fullscreen resolution in pixels.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": 4,
-        "disabled_by": -1,
-        "name": "Fullscreen Resolution Width"
-    }, {
-        "internal_name": "fullscreen_height",
-        "description": "Height of the custom fullscreen resolution in pixels.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": 4,
-        "disabled_by": -1,
-        "name": "Fullscreen Resolution Height"
-    }, {
-        "internal_name": "custom_internal_resolution",
-        "description": "Allows you to set a custom internal resolution for the game. Only works with Direct3D backends.",
-        "os": OS_WINDOWS,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Custom Internal Resolution"
-    }, {
-        "internal_name": "internal_resolution_width",
-        "description": "Width of the custom internal resolution in pixels.",
-        "os": OS_WINDOWS,
-        "type": TYPE_UINT,
-        "enabled_by": 7,
-        "disabled_by": -1,
-        "name": "Internal Resolution Width"
-    }, {
-        "internal_name": "internal_resolution_height",
-        "description": "Height of the custom internal resolution in pixels.",
-        "os": OS_WINDOWS,
-        "type": TYPE_UINT,
-        "enabled_by": 7,
-        "disabled_by": -1,
-        "name": "Internal Resolution Height"
-    }, {
-        "internal_name": "graphics_backend",
-        "description": "Changes the backend used to render the graphics.\nDirect3D 11 is recommended.",
-        "os": OS_WINDOWS,
-        "type": TYPE_BACKEND_WINDOWS,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Graphics Backend"
-    }, {
-        "internal_name": "graphics_backend",
-        "description": "Changes the backend used to render the graphics.",
-        "os": OS_LINUX,
-        "type": TYPE_BACKEND_LINUX,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Graphics Backend"
+        "name": "Fullscreen Display Mode"
     }],
     "hidden": false,
-    "reload_with_preset": false,
     "os": OS_ANY
 }, {
     "title": "AUDIO",
     "items": [{
         "internal_name": "overall_volume",
-        "description": "Changes the base volume for the game's audio output.",
+        "description": "Sets the base volume for the game's audio output.",
         "os": OS_ANY,
         "type": TYPE_PERCENTAGE,
         "enabled_by": -1,
@@ -112,7 +63,7 @@
         "name": "Overall Volume"
     }, {
         "internal_name": "music_volume",
-        "description": "Changes the volume of the in-game background music.",
+        "description": "Sets the volume of the in-game background music.",
         "os": OS_ANY,
         "type": TYPE_PERCENTAGE,
         "enabled_by": 0,
@@ -120,7 +71,7 @@
         "name": "Music Volume"
     }, {
         "internal_name": "jingle_volume",
-        "description": "Changes the volume of various in-game jingles.",
+        "description": "Sets the volume of various in-game jingles.",
         "os": OS_ANY,
         "type": TYPE_PERCENTAGE,
         "enabled_by": 0,
@@ -128,7 +79,7 @@
         "name": "Jingle Volume"
     }, {
         "internal_name": "sound_volume",
-        "description": "Changes the volume of the sound effects.",
+        "description": "Sets the volume of the sound effects.",
         "os": OS_ANY,
         "type": TYPE_PERCENTAGE,
         "enabled_by": 0,
@@ -136,21 +87,44 @@
         "name": "Sound Volume"
     }],
     "hidden": false,
-    "reload_with_preset": false,
     "os": OS_ANY
 }, {
     "title": "GRAPHICS",
     "items": [{
+        "internal_name": "internal_resolution",
+        "description": "Sets the multiplier for the internal resolution. 1x is 240p, 2x is 480p, and so on. Set it to \"Display Resolution\" to use the same resolution as your display.",
+        "os": OS_WINDOWS,
+        "type": TYPE_INTERNAL_RESOLUTION,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Internal Resolution"
+    }, {
+        "internal_name": "aspect_ratio",
+        "description": "Sets the game's aspect ratio. Set it to \"Auto\" to use the aspect ratio of your display.",
+        "os": OS_ANY,
+        "type": TYPE_ASPECT_RATIO,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Aspect Ratio"
+    }, {
         "internal_name": "frame_rate",
-        "description": "Chooses the frame rate the game renders at, using animation interpolation for higher frame rates.",
+        "description": "Sets the frame rate the game renders at. Animation interpolation is used for higher frame rates, and the game logic always runs at 30 FPS.",
         "os": OS_ANY,
         "type": TYPE_FRAME_RATE,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Frame Rate"
     }, {
+        "internal_name": "anti_aliasing",
+        "description": "Enables multisample anti-aliasing to reduce jagged edges. Higher values provide better quality.",
+        "os": OS_ANY,
+        "type": TYPE_ANTIALIASING,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Anti-Aliasing"
+    }, {
         "internal_name": "draw_distance",
-        "description": "Allows you to change the draw distance for certain objects. Disabling this setting forces the game to always render distant objects. Changes to this setting may affect the gameplay and lead to minor graphical issues.",
+        "description": "Changes the draw distance for certain objects. Changes to this setting may affect the gameplay in subtle ways, and lead to minor graphical issues.",
         "os": OS_ANY,
         "type": TYPE_DRAW_DISTANCE,
         "enabled_by": -1,
@@ -158,7 +132,7 @@
         "name": "Draw Distance"
     }, {
         "internal_name": "level_of_detail",
-        "description": "Sets the level of detail for certain in-game models. \"High\" is recommended.",
+        "description": "Sets the level of detail for certain in-game models.",
         "os": OS_ANY,
         "type": TYPE_LOD,
         "enabled_by": -1,
@@ -166,37 +140,44 @@
         "name": "Level of Detail"
     }, {
         "internal_name": "texture_filtering",
-        "description": "Changes the way the textures are filtered. \"3 Point\" filtering is what's used in the original game, but it only works with the \"Direct3D 11\" graphics backend.",
+        "description": "Changes the way the textures are filtered. \"3 Point\" filtering is what the original hardware uses.",
         "os": OS_ANY,
         "type": TYPE_TEXTURE_FILTERING,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Texture Filtering"
     }, {
+        "internal_name": "anisotropic_filtering",
+        "description": "Enables anisotropic filtering to improve texture quality at oblique angles.",
+        "os": OS_ANY,
+        "type": TYPE_ANISOTROPIC,
+        "enabled_by": 6,
+        "disabled_by": -1,
+        "name": "Anisotropic Filtering"
+    }, {
         "internal_name": "noise_type",
-        "description": "Changes the type of noise used for transparency effects. \"Chunky\" gives the most accurate results.",
+        "description": "Changes the type of noise used for transparency effects at higher internal resolutions. \"Chunky\" gives the most accurate results.",
         "os": OS_ANY,
         "type": TYPE_NOISE_TYPE,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Noise Type"
     }, {
-        "internal_name": "force_4by3",
-        "description": "Limits the game's aspect ratio to be roughly the same as the original game on Nintendo 64, regardless of the resolution.",
+        "internal_name": "n64_blur",
+        "description": "Adds a horizontal blur to the image, similar to the original Nintendo 64 hardware (though not completely accurate).",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
         "disabled_by": -1,
-        "name": "Force 4:3"
+        "name": "N64 Blur"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "CONTROLS",
     "items": [{
         "internal_name": "improved_controls",
-        "description": "Makes various tweaks to the controls, making them feel tighter and more precise overall.",
+        "description": "Applies various tweaks to the controls, making them feel tighter and more precise overall.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -204,7 +185,7 @@
         "name": "Improved Controls"
     }, {
         "internal_name": "improved_swimming",
-        "description": "Makes minor tweaks to the swimming controls, also making them more precise.",
+        "description": "Applies minor tweaks to the swimming controls, also making them more precise.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -212,7 +193,7 @@
         "name": "Improved Swimming"
     }, {
         "internal_name": "improved_hanging",
-        "description": "Makes movement when hanging on ceilings faster, and removes the requirement of holding A to stay hanging.",
+        "description": "Improves hanging on ceilings by making the movement faster and removing the requirement of holding A.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -220,7 +201,7 @@
         "name": "Improved Hanging"
     }, {
         "internal_name": "enemy_bouncing",
-        "description": "Makes it so that holding A when jumping on an enemy makes you bounce higher, just like in most other Mario games.",
+        "description": "Allows you to bounce off the enemies higher by holding A, just like in most other Mario games.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -236,7 +217,7 @@
         "name": "D-Pad Controls"
     }, {
         "internal_name": "full_air_control",
-        "description": "Gives you near full control over Mario's direction in air. This setting significantly alters the way the controls feel and is not recommended for the first-time players.",
+        "description": "Gives you near full control over Mario's direction in air. This setting significantly alters the way the controls feel and is not recommended for first-time players.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -244,21 +225,20 @@
         "name": "Full Air Control"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "GAMEPLAY",
     "items": [{
-        "internal_name": "apply_bug_fixes",
-        "description": "Fixes various small issues present in the original game. Applying collision fixes might make some speedrunning tricks impossible.",
+        "internal_name": "fix_gameplay_bugs",
+        "description": "Fixes various gameplay issues present in the original game. Fixing collision issues and exploits will make certain speedrunning tricks impossible.",
         "os": OS_ANY,
         "type": TYPE_FIXES,
         "enabled_by": -1,
         "disabled_by": -1,
-        "name": "Apply Bug Fixes"
+        "name": "Fix Gameplay Bugs"
     }, {
         "internal_name": "save_lives_to_save_file",
-        "description": "Saves amount of lives you have to the currently selected save file. In the original game the number of lives resets each time you load a save file.",
+        "description": "Saves the number of lives you have to the currently selected save file. In the original game, the number of lives resets each time you load a save file.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -282,7 +262,7 @@
         "name": "Remove Inconvenient Warps"
     }, {
         "internal_name": "improved_powerups",
-        "description": "Makes it so that underwater shells last longer and Metal Mario sinks faster, and Metal Mario's interactions become more consistent.",
+        "description": "Makes underwater shells last longer, makes Metal Mario sink faster, and makes Metal Mario's interactions with various objects more consistent.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -290,7 +270,7 @@
         "name": "Improved Powerups"
     }, {
         "internal_name": "improved_enemies",
-        "description": "Tweaks the behavior of some enemies, specifically Boos, Clams, and Tiny Goombas.",
+        "description": "Fixes some inconsistencies in the behaviors of some enemies. Specifically Boos, Clams, and Tiny Goombas.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -298,7 +278,7 @@
         "name": "Improved Enemies"
     }, {
         "internal_name": "improved_npcs",
-        "description": "Makes talking with the NPCs easier and more consistent.",
+        "description": "Makes talking to the NPCs easier and more consistent.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -314,7 +294,7 @@
         "name": "Improved \"Blast Away the Wall\""
     }, {
         "internal_name": "bring_mips_back",
-        "description": "Makes MIPS return to the castle after you collect 120 Power Stars.",
+        "description": "Makes MIPS return to the castle after you collect 120 Power Stars, with a special message.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -330,37 +310,20 @@
         "name": "Disable Fall Damage"
     }, {
         "internal_name": "allow_leaving_the_course_at_any_time",
-        "description": "Makes it so that you don't have to be standing still to leave the course from the pause menu. Do not use this to cheat, that wouldn't be very nice!",
+        "description": "Allows you to leave a course from the pause menu without having to stand still. Do not use this to cheat, that wouldn't be very nice!",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Allow Leaving the Course at Any Time"
-    }, {
-        "internal_name": "make_secrets_visible",
-        "description": "Gives all the secrets a sparkle effect to make them easier to find. Might make some missions too easy.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Make Secrets Visible"
-    }, {
-        "internal_name": "fix_exploits",
-        "description": "Fixes various exploits like the bomb clip, hands-free holding, and Backwards Long Jump. Perfect for those who hate fun.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Fix Exploits"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "PROGRESSION",
     "items": [{
         "internal_name": "tie_bowsers_sub_to_missions",
-        "description": "Makes Bowser's submarine to always appear in the first mission of Dire Dire Docks, and never in the later ones. It's recommended to leave this enabled if you have no idea what any of this is about.",
+        "description": "Makes Bowser's submarine always appear in the first mission of Dire Dire Docks, and never in the later ones. It's recommended to leave this enabled if you have no idea what any of this is about.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -392,7 +355,7 @@
         "name": "Auto Switch to the Next Mission"
     }, {
         "internal_name": "skip_cutscenes",
-        "description": "Skips some cutscenes that could become repetitive during repeat playthroughs.",
+        "description": "Skips some cutscenes that could become repetitive during repeat playthroughs. Not recommended for the first-time players.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -400,13 +363,12 @@
         "name": "Skip Cutscenes"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "CAMERA",
     "items": [{
         "internal_name": "default_camera_mode",
-        "description": "Changes the default camera mode.\nThe default mode from the original game is \"Lakitu Cam\".",
+        "description": "Changes the default camera mode.\nThe default mode in the original game is \"Lakitu Cam\".",
         "os": OS_ANY,
         "type": TYPE_CAMERA_MODE,
         "enabled_by": -1,
@@ -414,7 +376,7 @@
         "name": "Default Camera Mode"
     }, {
         "internal_name": "alternate_camera_mode",
-        "description": "Changes the alternate camera mode that you can switch to in-game.\nThe default mode from the original game is \"Mario Cam\".",
+        "description": "Changes the alternate camera mode that you can switch to in-game.\nThe default mode in the original game is \"Mario Cam\".",
         "os": OS_ANY,
         "type": TYPE_CAMERA_MODE,
         "enabled_by": -1,
@@ -422,7 +384,7 @@
         "name": "Alternate Camera Mode"
     }, {
         "internal_name": "horizontal_analog_camera",
-        "description": "Allows horizontal analog camera movement using the right analog stick, and removes most camera movement limits.",
+        "description": "Allows horizontal analog camera movement using the right analog stick and removes most camera movement limits.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -437,6 +399,14 @@
         "disabled_by": -1,
         "name": "Vertical Analog Camera"
     }, {
+        "internal_name": "improved_cbutton_camera",
+        "description": "Allows you to rotate the camera with more precision with the C-Buttons.",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Improved C-Button Camera"
+    }, {
         "internal_name": "center_camera_button",
         "description": "Allows you to center the camera behind Mario by pressing L, similarly to the DS version. Doesn't work when the camera is locked.",
         "os": OS_ANY,
@@ -446,15 +416,15 @@
         "name": "Center Camera Button"
     }, {
         "internal_name": "invert_horizontal_camera_controls",
-        "description": "Inverts the horizontal camera controls when the \"Horizontal Analog Camera\" setting is enabled.",
+        "description": "Inverts horizontal camera controls when either the \"Horizontal Analog Camera\" or \"Improved C-Button Camera\" setting is enabled.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
-        "enabled_by": 2,
+        "enabled_by": -1,
         "disabled_by": -1,
         "name": "Invert Horizontal Camera Controls"
     }, {
         "internal_name": "invert_vertical_camera_controls",
-        "description": "Inverts the vertical camera controls when the \"Verical Analog Camera\" setting is enabled.",
+        "description": "Inverts vertical camera controls when the \"Vertical Analog Camera\" setting is enabled.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": 3,
@@ -462,7 +432,7 @@
         "name": "Invert Vertical Camera Controls"
     }, {
         "internal_name": "analog_camera_speed",
-        "description": "Sets the movement speed of the analog camera.\nThe default value is 32.",
+        "description": "Sets the movement speed of the analog camera. Also applies to the improved C-Button camera.\nThe default value is 32.",
         "os": OS_ANY,
         "type": TYPE_FLOAT,
         "enabled_by": -1,
@@ -486,13 +456,20 @@
         "name": "Additional FoV"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "HUD AND UI",
     "items": [{
+        "internal_name": "fix_text_typos",
+        "description": "Fixes various typos in the game's text, including Yoshi's infamous \"Mario!!! It that really you???\".",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Fix Text Typos"
+    }, {
         "internal_name": "add_quit_option",
-        "description": "Adds an \"Exit to Desktop\" option to the pause menu.\nIt's the little things that make a difference...",
+        "description": "Adds an \"Exit to Desktop\" option to the pause menu. It's the little things that make a difference...",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -508,7 +485,7 @@
         "name": "HUD Layout"
     }, {
         "internal_name": "4by3_hud",
-        "description": "Centers the HUD as if the screen ratio is 4:3. Makes no practical difference when the \"Force 4:3\" setting enabled.",
+        "description": "Centers the HUD as if the screen ratio is 4:3. Makes no practical difference when the \"Aspect Ratio\" is set to \"Force 4:3\".",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -516,7 +493,7 @@
         "name": "4:3 HUD"
     }, {
         "internal_name": "show_the_collected_stars",
-        "description": "Shows the stars you've collected in a course in the HUD. Goes well with the \"Stay in Course After Getting a Star\" setting.",
+        "description": "Shows the stars you've collected in a course in the HUD. Goes well with the \"Always Stay in Course\" setting.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -540,7 +517,7 @@
         "name": "Always Show the 100 Coin Star"
     }, {
         "internal_name": "always_show_the_health_meter",
-        "description": "Prevents the health bar from hiding automatically. Makes no difference when the \"Modern\" HUD style is used.",
+        "description": "Prevents the health bar from hiding automatically. Makes no difference when the \"Modern\" HUD layout is used.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -548,7 +525,7 @@
         "name": "Always Show the Health Meter"
     }, {
         "internal_name": "hud_filtering",
-        "description": "Makes it so that the HUD elements get texture filtering just like the rest of in-game textures. Not recommended with default textures.",
+        "description": "Applies texture filtering to the HUD elements. Not recommended with default textures.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -564,69 +541,6 @@
         "name": "Hide HUD"
     }],
     "hidden": false,
-    "reload_with_preset": true,
-    "os": OS_ANY
-}, {
-    "title": "MOUSE",
-    "items": [{
-        "internal_name": "mouse_support",
-        "description": "Allows you to navigate the menus and control the camera with your mouse. Only fully works when the \"Analog Camera\" settings are enabled, and works best with the \"Custom\" camera mode.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Mouse Support"
-    }, {
-        "internal_name": "mouse_sensitivity",
-        "description": "Sets the mouse sensitivity when the \"Mouse Support\" setting is on.\nThe default value is 4.",
-        "os": OS_ANY,
-        "type": TYPE_FLOAT,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Mouse Sensitivity"
-    }, {
-        "internal_name": "left_mouse_button_action",
-        "description": "The action assigned to the left mouse button when the \"Mouse Support\" setting is on.",
-        "os": OS_ANY,
-        "type": TYPE_MOUSE_BUTTON,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Left Mouse Button Action"
-    }, {
-        "internal_name": "right_mouse_button_action",
-        "description": "The action assigned to the right mouse button when the \"Mouse Support\" setting is on.",
-        "os": OS_ANY,
-        "type": TYPE_MOUSE_BUTTON,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Right Mouse Button Action"
-    }, {
-        "internal_name": "middle_mouse_button_action",
-        "description": "The action assigned to the middle mouse button when the \"Mouse Support\" setting is on.",
-        "os": OS_ANY,
-        "type": TYPE_MOUSE_BUTTON,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Middle Mouse Button Action"
-    }, {
-        "internal_name": "mouse_wheel_up_action",
-        "description": "The action assigned to the mouse wheel moving upwards while the \"Mouse Support\" setting is on.",
-        "os": OS_ANY,
-        "type": TYPE_MOUSE_BUTTON,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Mouse Wheel Up Action"
-    }, {
-        "internal_name": "mouse_wheel_down_action",
-        "description": "The action assigned to tthe mouse wheel moving downwards while the \"Mouse Support\" setting is on.",
-        "os": OS_ANY,
-        "type": TYPE_MOUSE_BUTTON,
-        "enabled_by": 0,
-        "disabled_by": -1,
-        "name": "Mouse Wheel Down Action"
-    }],
-    "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "EXTRA MOVES",
@@ -640,7 +554,7 @@
         "name": "Wall Sliding"
     }, {
         "internal_name": "ground_pound_jump",
-        "description": "Allows you to perform a high jump right after performing a ground pound, like seen in most recent 3D Mario titles.",
+        "description": "Allows you to perform a high jump right after a ground pound, like in recent 3D Mario titles.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -656,7 +570,7 @@
         "name": "Sunshine Dive Hop"
     }, {
         "internal_name": "odyssey_ground_pound_dive",
-        "description": "Allows you to perform the dive move the same way you would in Super Mario Odyssey.",
+        "description": "Allows you to perform the dive move the same way as in Super Mario Odyssey.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -672,7 +586,7 @@
         "name": "Odyssey Rolling"
     }, {
         "internal_name": "flashback_ground_pound",
-        "description": "Gives Mario a little bounce after landing from a ground pound. You can cancel the bounce by holding Z, or perform a slide by holding a direction. Borrowed from Super Mario Flashback.",
+        "description": "Gives Mario a small bounce after landing from a ground pound. You can cancel the bounce by holding Z, or perform a slide by holding a direction. Borrowed from Super Mario Flashback.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -680,13 +594,12 @@
         "name": "Flashback Ground Pound"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "RESTORATIONS",
     "items": [{
         "internal_name": "enable_the_unused_pyramid_cutscene",
-        "description": "Enables the unused pyramid explosion cutscene in Shifting Sand Land.",
+        "description": "Restores the unused pyramid explosion cutscene in Shifting Sand Land.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -694,7 +607,7 @@
         "name": "Enable the Unused Pyramid Cutscene"
     }, {
         "internal_name": "restore_unused_sound_effects",
-        "description": "Restores the Bowser defeat cutscene sound effects, and the unused the trapdoor sound for the first star door.",
+        "description": "Restores the Bowser defeat cutscene sound effects, and the unused the trapdoor sound effect for the first star door.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -702,7 +615,7 @@
         "name": "Restore Unused Sound Effects"
     }, {
         "internal_name": "restore_mother_penguins_sad_eyes",
-        "description": "Restores the unused, sad looking eye texture for the mother penguin, as seen in the Shoshinkai 1995 beta footage.",
+        "description": "Restores the unused sad-looking eye texture for the mother penguin, as seen in the Shoshinkai 1995 beta footage.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -734,7 +647,7 @@
         "name": "Make Mario Sparkle at Course Start"
     }, {
         "internal_name": "replace_keys_with_stars_when_collected",
-        "description": "Adds back a bug from the Japanese version of the game where it shows a star when you grab a key after defeating Bowser.",
+        "description": "Restores a bug from the Japanese version of the game where it shows a star when you grab a key after defeating Bowser.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -742,11 +655,18 @@
         "name": "Replace Keys w\/ Stars When Collected"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "BONUS MODES",
     "items": [{
+        "internal_name": "casual_mode",
+        "description": "Makes Mario not lose any health when underwater, and reduces all damage taken by half.",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Casual Mode"
+    }, {
         "internal_name": "infinite_lives_mode",
         "description": "Disables the lives system and makes it impossible to get a Game Over.",
         "os": OS_ANY,
@@ -763,13 +683,13 @@
         "disabled_by": -1,
         "name": "Encore Mode"
     }, {
-        "internal_name": "green_demon_mode",
-        "description": "Makes it so that 1-Up Mushrooms kill you instantly. Based on the popular challenge with same name.",
+        "internal_name": "invisible_mode",
+        "description": "Makes Mario completely invisible, making it hard to exactly tell where he is.",
         "os": OS_ANY,
-        "type": TYPE_GREEN_DEMON_MODE,
+        "type": TYPE_BOOL,
         "enabled_by": -1,
         "disabled_by": -1,
-        "name": "Green Demon Mode"
+        "name": "Invisible Mode"
     }, {
         "internal_name": "no_healing_mode",
         "description": "Makes it so that the only way to heal Mario is to collect a Power Star. Also removes all Spinning Hearts.",
@@ -779,8 +699,16 @@
         "disabled_by": -1,
         "name": "No Healing Mode"
     }, {
+        "internal_name": "green_demon_mode",
+        "description": "Makes it so that 1-Up Mushrooms kill you instantly. Based on the popular challenge with same name.",
+        "os": OS_ANY,
+        "type": TYPE_GREEN_DEMON_MODE,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Green Demon Mode"
+    }, {
         "internal_name": "hard_mode",
-        "description": "Not only removes Mario's cap so he takes more damage, but also makes the bosses and races harder. Perfect for those who are looking for a bit more challenge!\nWARNING: If you start a game, or save to an existing save slot with Hard Mode on that save slot will forever be stuck at Hard Mode!",
+        "description": "Not only removes Mario's cap so he takes more damage, but also makes the bosses and races harder. Perfect for those who are looking for a bit more challenge!\nWARNING: If you start a game, or save to an existing save slot with Hard Mode on that save slot will forever be locked at Hard Mode!",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -788,7 +716,7 @@
         "name": "Hard Mode"
     }, {
         "internal_name": "daredevil_mode",
-        "description": "You have only 1 hit point! All you need to die is to get hit once, so be careful! At least you can swim as much as you want...\nWARNING: If you start a game, or save to an existing save slot with Daredevil Mode on that save slot will forever be stuck at Daredevil Mode!",
+        "description": "You have only 1 hit point! All you need to die is to get hit once, so be careful! At least you can swim as much as you want...\nWARNING: If you start a game, or save to an existing save slot with Daredevil Mode on that save slot will forever be locked at Daredevil Mode!",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -796,32 +724,14 @@
         "name": "Daredevil Mode"
     }, {
         "internal_name": "permadeath_mode",
-        "description": "You have only 1 life! Once you die, your save data gets deleted, with no way to restore it. Only for those who want the ultimate challenge!\nWARNING: If you start a game, or save to an existing save slot with Permadeath Mode on that save slot will forever be stuck at Permadeath Mode!",
+        "description": "You have only 1 life! Once you die, your save data gets deleted, with no way to restore it. Only for those who want the ultimate challenge!\nWARNING: If you start a game, or save to an existing save slot with Permadeath Mode on that save slot will forever be locked at Permadeath Mode!",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Permadeath Mode"
-    }, {
-        "internal_name": "casual_mode",
-        "description": "Makes Mario not lose any health when underwater, and reduces all damage taken by half.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Casual Mode"
-    },
-    {
-        "internal_name": "invisible_mode",
-        "description": "Makes Mario completely invisible, making it impossible to exactly tell where he is.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Invisible Mode"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "COLORS",
@@ -947,7 +857,7 @@
         "name": "Hair Colors Shading"
     }, {
         "internal_name": "show_cap_logo",
-        "description": "Makes the \"M\" logo appear on Mario's cap.",
+        "description": "Makes the \"M\" logo appear on Mario's cap, as usual. You might want to disable this if you're using custom colors, but hey, I'm not your mom.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -955,13 +865,12 @@
         "name": "Show Cap Logo"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "CHEATS",
     "items": [{
         "internal_name": "level_select",
-        "description": "Enables the good old debug level select menu.",
+        "description": "Enables the unused debug level select menu.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -969,7 +878,7 @@
         "name": "Level Select"
     }, {
         "internal_name": "debug_movement_mode",
-        "description": "Allows you switch to the debug movement mode by pressing L on air. While in it you can move freely using the D-Pad and the analog stick. Enabling this disables \"D-Pad Controls\".",
+        "description": "Enables the unused debug movement mode. Press L on air to enter the debug movement mode and use the D-Pad and the analog stick to move freely on air. Enabling this disables \"D-Pad Controls\".",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -1000,16 +909,8 @@
         "disabled_by": -1,
         "name": "Moon Jump"
     }, {
-        "internal_name": "easy_bowser_throws",
-        "description": "Makes throwing Bowser easier. For babies.",
-        "os": OS_ANY,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Easy Bowser Throws"
-    },{
         "internal_name": "blj_everywhere",
-        "description": "Allows you to perform a BLJ out of thin air. Shoutouts to Kaze.",
+        "description": "Allows you to perform a BLJ anywhere, everywhere. Shoutouts to Kaze.",
         "os": OS_ANY,
         "type": TYPE_BLJ_EVERYWHERE,
         "enabled_by": -1,
@@ -1032,6 +933,22 @@
         "disabled_by": -1,
         "name": "Hyperspeed Mode"
     }, {
+        "internal_name": "easy_bowser_throws",
+        "description": "Makes throwing Bowser easier. For little babies who cannot get the timing right. (Me. That's me.)",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Easy Bowser Throws"
+    }, {
+        "internal_name": "make_secrets_visible",
+        "description": "Adds a sparkle effect to all secrets to make them easier to find.",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Make Secrets Visible"
+    }, {
         "internal_name": "no_cannon_limits",
         "description": "Allows you to rotate the cannons more than you're supposed to.",
         "os": OS_ANY,
@@ -1049,13 +966,12 @@
         "name": "Coins Required for the Coin Stars"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "FOR FUN",
     "items": [{
         "internal_name": "rock_paper_scissors",
-        "description": "Changes Mario's victory pose randomly to rock, paper or scissors, just like Super Mario Odyssey.",
+        "description": "Changes Mario's victory pose randomly to rock, paper, or scissors, just like in Super Mario Odyssey.",
         "os": OS_ANY,
         "type": TYPE_BOOL,
         "enabled_by": -1,
@@ -1086,14 +1002,6 @@
         "disabled_by": -1,
         "name": "FX Mode"
     }, {
-        "internal_name": "wireframe_mode",
-        "description": "Renders everything in wireframe mode. Only works with the Direct3D backends.",
-        "os": OS_WINDOWS,
-        "type": TYPE_BOOL,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Wireframe Mode"
-    }, {
         "internal_name": "disable_lighting",
         "description": "Disables the in-game lighting, giving everything a flatter look.",
         "os": OS_ANY,
@@ -1103,7 +1011,6 @@
         "name": "Disable Lighting"
     }],
     "hidden": true,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
     "title": "ADVANCED",
@@ -1124,14 +1031,6 @@
         "disabled_by": -1,
         "name": "Show Debug Profiler"
     }, {
-        "internal_name": "fullscreen_refresh_rate",
-        "description": "The refresh rate that will be used for when \"Custom Fullscreen Resolution\" is enabled. 60 is recommended.",
-        "os": OS_ANY,
-        "type": TYPE_UINT,
-        "enabled_by": -1,
-        "disabled_by": -1,
-        "name": "Fullscreen Refresh Rate"
-    }, {
         "internal_name": "custom_camera_distance",
         "description": "Sets the default camera distance when using the \"Modern\" and \"Custom\" camera settings.\nThe default value is 100.",
         "os": OS_ANY,
@@ -1149,13 +1048,12 @@
         "name": "Zoomed Out Custom Camera Distance"
     }],
     "hidden": true,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
-    "title": "INPUT MAPPING",
+    "title": "CONTROLLER MAPPING",
     "items": [{
         "internal_name": "button_a",
-        "description": "The controller button assigned to the A button.",
+        "description": "Sets the controller button assigned to the A button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1163,7 +1061,7 @@
         "name": "A (Jump)"
     }, {
         "internal_name": "button_b",
-        "description": "The controller button assigned to the B button.",
+        "description": "Sets the controller button assigned to the B button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1171,7 +1069,7 @@
         "name": "B (Punch)"
     }, {
         "internal_name": "button_start",
-        "description": "The controller button assigned to the Start button.",
+        "description": "Sets the controller button assigned to the Start button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1179,7 +1077,7 @@
         "name": "Start (Pause)"
     }, {
         "internal_name": "button_l",
-        "description": "The controller button assigned to the L trigger.",
+        "description": "Sets the controller button assigned to the L trigger.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1187,7 +1085,7 @@
         "name": "L (Center Camera)"
     }, {
         "internal_name": "button_r",
-        "description": "The controller button assigned to the R trigger.",
+        "description": "Sets the controller button assigned to the R trigger.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1195,7 +1093,7 @@
         "name": "R (Change Camera)"
     }, {
         "internal_name": "button_z",
-        "description": "The controller button assigned to the Z trigger.",
+        "description": "Sets the controller button assigned to the Z trigger.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1203,7 +1101,7 @@
         "name": "Z (Crouch)"
     }, {
         "internal_name": "button_cup",
-        "description": "The controller button assigned to the C-Up button.",
+        "description": "Sets the controller button assigned to the C-Up button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1211,7 +1109,7 @@
         "name": "C-Up (Zoom In)"
     }, {
         "internal_name": "button_cdown",
-        "description": "The controller button assigned to the C-Down button.",
+        "description": "Sets the controller button assigned to the C-Down button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1219,7 +1117,7 @@
         "name": "C-Down (Zoom Out)"
     }, {
         "internal_name": "button_cleft",
-        "description": "The controller button assigned to the C-Left button.",
+        "description": "Sets the controller button assigned to the C-Left button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1227,7 +1125,7 @@
         "name": "C-Left (Rotate Left)"
     }, {
         "internal_name": "button_cright",
-        "description": "The controller button assigned to the C-Right button.",
+        "description": "Sets the controller button assigned to the C-Right button.",
         "os": OS_ANY,
         "type": TYPE_CONTROLLER_BUTTON,
         "enabled_by": -1,
@@ -1251,21 +1149,28 @@
         "name": "Right Analog Stick Deadzone"
     }, {
         "internal_name": "rumble_strength",
-        "description": "Enables and sets the strength of the controller rumble effect.\nWorks the same way as the Super Mario 3D All-Stars and the Shindou Edition.",
+        "description": "Enables and sets the strength of the controller rumble effect.\nRumble itself works the same way as the Super Mario 3D All-Stars and the Shindou Edition.",
         "os": OS_ANY,
         "type": TYPE_PERCENTAGE,
         "enabled_by": -1,
         "disabled_by": -1,
         "name": "Rumble Strength"
+    }, {
+        "internal_name": "block_non_xinput_controllers",
+        "description": "Disables the support for non-XInput controllers, since they can cause conflicts with certain remapping software (like BetterJoy).",
+        "os": OS_WINDOWS,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Block Non-XInput Controllers"
     }],
     "hidden": false,
-    "reload_with_preset": true,
     "os": OS_ANY
 }, {
-    "title": "KEY MAPPING",
+    "title": "KEYBOARD MAPPING",
     "items": [{
         "internal_name": "key_a",
-        "description": "The keyboard key assigned to the A button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the A button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1273,7 +1178,7 @@
         "name": "A (Jump)"
     }, {
         "internal_name": "key_b",
-        "description": "The keyboard key assigned to the B button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the B button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1281,7 +1186,7 @@
         "name": "B (Punch)"
     }, {
         "internal_name": "key_start",
-        "description": "The keyboard key assigned to the Start button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the Start button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1289,7 +1194,7 @@
         "name": "Start (Pause)"
     }, {
         "internal_name": "key_l",
-        "description": "The keyboard key assigned to the L trigger.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the L trigger.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1297,7 +1202,7 @@
         "name": "L (Center Camera)"
     }, {
         "internal_name": "key_r",
-        "description": "The keyboard key assigned to the R trigger.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the R trigger.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1305,7 +1210,7 @@
         "name": "R (Change Camera)"
     }, {
         "internal_name": "key_z",
-        "description": "The keyboard key assigned to the Z trigger.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the Z trigger.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1313,7 +1218,7 @@
         "name": "Z (Crouch)"
     }, {
         "internal_name": "key_cup",
-        "description": "The keyboard key assigned to the C-Up button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the C-Up button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1321,7 +1226,7 @@
         "name": "C-Up (Zoom In)"
     }, {
         "internal_name": "key_cdown",
-        "description": "The keyboard key assigned to the C-Down button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the C-Down button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1329,7 +1234,7 @@
         "name": "C-Down (Zoom Out)"
     }, {
         "internal_name": "key_cleft",
-        "description": "The keyboard key assigned to the C-Left button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the C-Left button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1337,7 +1242,7 @@
         "name": "C-Left (Rotate Left)"
     }, {
         "internal_name": "key_cright",
-        "description": "The keyboard key assigned to the C-Right button.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the C-Right button.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1345,7 +1250,7 @@
         "name": "C-Right (Rotate Right)"
     }, {
         "internal_name": "key_stickup",
-        "description": "The keyboard key assigned to the stick up action.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the stick up action.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1353,7 +1258,7 @@
         "name": "Stick Up"
     }, {
         "internal_name": "key_stickdown",
-        "description": "The keyboard key assigned to the stick down action.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the stick down action.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1361,7 +1266,7 @@
         "name": "Stick Down"
     }, {
         "internal_name": "key_stickleft",
-        "description": "The keyboard key assigned to the stick left action.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the stick left action.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1369,7 +1274,7 @@
         "name": "Stick Left"
     }, {
         "internal_name": "key_stickright",
-        "description": "The keyboard key assigned to the stick right action.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key assigned to the stick right action.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1377,7 +1282,7 @@
         "name": "Stick Right"
     }, {
         "internal_name": "key_walktrigger",
-        "description": "The keyboard key that makes Mario walk slowly when held down.\nThe value is a DirectInput scan code.",
+        "description": "Sets the keyboard key that makes Mario walk slowly when held down.\nThe value is a scancode.",
         "os": OS_ANY,
         "type": TYPE_KEY,
         "enabled_by": -1,
@@ -1385,6 +1290,66 @@
         "name": "Walk Trigger"
     }],
     "hidden": false,
-    "reload_with_preset": true,
+    "os": OS_ANY
+}, {
+    "title": "MOUSE",
+    "items": [{
+        "internal_name": "mouse_support",
+        "description": "Allows you to navigate the menus with your mouse. Also works with the camera if you enable the \"Analog Camera\" settings, and works best with the \"Custom\" camera mode.",
+        "os": OS_ANY,
+        "type": TYPE_BOOL,
+        "enabled_by": -1,
+        "disabled_by": -1,
+        "name": "Mouse Support"
+    }, {
+        "internal_name": "mouse_sensitivity",
+        "description": "Sets the mouse sensitivity when the \"Mouse Support\" setting is on.\nThe default value is 4.",
+        "os": OS_ANY,
+        "type": TYPE_FLOAT,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Mouse Sensitivity"
+    }, {
+        "internal_name": "left_mouse_button_action",
+        "description": "Sets the action assigned to the left mouse button when \"Mouse Support\" is on.",
+        "os": OS_ANY,
+        "type": TYPE_MOUSE_BUTTON,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Left Mouse Button Action"
+    }, {
+        "internal_name": "right_mouse_button_action",
+        "description": "Sets the action assigned to the right mouse button when \"Mouse Support\" is on.",
+        "os": OS_ANY,
+        "type": TYPE_MOUSE_BUTTON,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Right Mouse Button Action"
+    }, {
+        "internal_name": "middle_mouse_button_action",
+        "description": "Sets the action assigned to the middle mouse button when \"Mouse Support\" is on.",
+        "os": OS_ANY,
+        "type": TYPE_MOUSE_BUTTON,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Middle Mouse Button Action"
+    }, {
+        "internal_name": "mouse_wheel_up_action",
+        "description": "Sets the action assigned to scrolling the mouse wheel up when \"Mouse Support\" is on.",
+        "os": OS_ANY,
+        "type": TYPE_MOUSE_BUTTON,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Mouse Wheel Up Action"
+    }, {
+        "internal_name": "mouse_wheel_down_action",
+        "description": "Sets the action assigned to scrolling the mouse wheel down when \"Mouse Support\" is on.",
+        "os": OS_ANY,
+        "type": TYPE_MOUSE_BUTTON,
+        "enabled_by": 0,
+        "disabled_by": -1,
+        "name": "Mouse Wheel Down Action"
+    }],
+    "hidden": false,
     "os": OS_ANY
 }]
