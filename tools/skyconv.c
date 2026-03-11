@@ -230,16 +230,35 @@ void write_tiles() {
         exit(EXIT_FAILURE);
     }
 
-    strcat(buffer, "/");
+    size_t dirLength = strlen(buffer);
+    if (dirLength + 1 >= sizeof(buffer)) {
+        fprintf(stderr, "err: Image dir path too long\n");
+        exit(EXIT_FAILURE);
+    }
+
+    buffer[dirLength++] = '/';
+    buffer[dirLength] = '\0';
 
     switch(type) {
         case Skybox:
+            if (dirLength + strlen(skyboxName) >= sizeof(buffer)) {
+                fprintf(stderr, "err: Skybox name path too long\n");
+                exit(EXIT_FAILURE);
+            }
             strcat(buffer, skyboxName);
         break;
         case Cake:
+            if (dirLength + strlen("cake") >= sizeof(buffer)) {
+                fprintf(stderr, "err: Cake path too long\n");
+                exit(EXIT_FAILURE);
+            }
             strcat(buffer, "cake");
         break;
         case CakeEU:
+            if (dirLength + strlen("cake_eu") >= sizeof(buffer)) {
+                fprintf(stderr, "err: Cake path too long\n");
+                exit(EXIT_FAILURE);
+            }
             strcat(buffer, "cake_eu");
         break;
         default:
@@ -247,12 +266,22 @@ void write_tiles() {
         break;
     }
 
-    int dirLength = strlen(buffer);
+    dirLength = strlen(buffer);
     char *filename = buffer + dirLength;
+    size_t remaining = sizeof(buffer) - dirLength;
+    if (remaining == 0) {
+        fprintf(stderr, "err: Image dir path too long\n");
+        exit(EXIT_FAILURE);
+    }
+
     for (int i = 0; i < props.numRows * props.numCols; i++) {
         if (!tiles[i].useless) {
             *filename = 0;
-            snprintf(filename, PATH_MAX, ".%d.rgba16.png", tiles[i].pos);
+            int written = snprintf(filename, remaining, ".%d.rgba16.png", tiles[i].pos);
+            if (written < 0 || (size_t) written >= remaining) {
+                fprintf(stderr, "err: Tile filename too long\n");
+                exit(EXIT_FAILURE);
+            }
             rgba2png(buffer, tiles[i].px, props.tileWidth, props.tileHeight);
         }
     }

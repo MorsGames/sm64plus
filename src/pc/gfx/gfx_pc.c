@@ -845,7 +845,12 @@ static void import_texture(int tile) {
 #ifdef TARGET_MACOS
     _NSGetExecutablePath(exec_path, &size);
 #else
-    readlink("/proc/self/exe", exec_path, size);
+    ssize_t len = readlink("/proc/self/exe", exec_path, size - 1);
+    if (len >= 0) {
+        exec_path[len] = '\0';
+    } else {
+        exec_path[0] = '\0';
+    }
 #endif
     dir = dirname(exec_path);
     const char gfx_path[1024];

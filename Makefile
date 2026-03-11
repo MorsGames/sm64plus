@@ -977,13 +977,14 @@ $(EXE): $(O_FILES) $(MIO0_FILES:.mio0=.o) $(ULTRA_O_FILES) $(GODDARD_O_FILES)
 	$(LD) -L $(BUILD_DIR) -o $@ $(O_FILES) $(ULTRA_O_FILES) $(GODDARD_O_FILES) $(LDFLAGS)
 endif
 
- # Copying the dynamically linked DLL files
+  # Copying the dynamically linked DLL files (Windows only)
   ifeq ($(TARGET_WINDOWS),1)
-  $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/SDL2.dll" "$(BUILD_DIR)/SDL2.dll")
+	$(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/SDL2.dll" "$(BUILD_DIR)/SDL2.dll")
 
   ifeq ($(TARGET_32BIT),1)
     $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libgcc_s_dw2-1.dll" "$(BUILD_DIR)/libgcc_s_dw2-1.dll")
     $(shell a=$(PATH); b=$${a%%:*}; cp "$${b}/libwinpthread-1.dll" "$(BUILD_DIR)/libwinpthread-1.dll")
+  endif
   endif
   endif
 endif
